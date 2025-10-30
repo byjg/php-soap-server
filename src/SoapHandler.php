@@ -423,58 +423,29 @@ class SoapHandler
     {
         header('Content-Type: text/html');
 
-        $css = '
-body {
-    margin: 0px;
-    padding: 10px;
-    font-family: sans-serif;
-}
-#header {
-    background-color: #339900;
-    color: #FFFFFF;
-    padding: 5px 10px;
-    margin: -10px;
-}
-h1 {
-    font-size: xx-large;
-    color: #CCFF99;
-}
-#header p {
-    font-size: large;
-}
-
-dt {
-    margin-top: 1em;
-}
-
-.description {
-    padding-left: 1.5em;
-    margin-bottom: 1.5em;
-}
-
-a:link {
-    color: #006600;
-}
-
-a:visited {
-    color: #030;
-}
-
-a:hover {
-    color: #003300;
-}
-';
-
         // Prepare methods data for template
         $methods = [];
         foreach ($this->wsdlStruct[$this->classname]['method'] as $methodName => $method) {
-            $paramTypes = [];
+            $params = [];
+            $paramTypesForSignature = [];
+
             foreach ($method['var'] as $methodVars) {
                 if (isset($methodVars['param'])) {
-                    $paramTypes[] = $methodVars['type']
-                                     . str_repeat('[]', $methodVars['length']);
+                    $paramType = $methodVars['type'] . str_repeat('[]', $methodVars['length']);
+                    $paramName = $methodVars['name'];
+
+                    // Build params array for table display
+                    $params[] = [
+                        'name' => $paramName,
+                        'type' => $paramType,
+                        'required' => ($methodVars['minOccurs'] ?? 1) > 0 ? '✅ Yes' : '❌ No'
+                    ];
+
+                    // Build signature string
+                    $paramTypesForSignature[] = $paramType . ' ' . $paramName;
                 }
             }
+
             $returnTypes = [];
             foreach ($method['var'] as $methodVars) {
                 if (isset($methodVars['return'])) {
@@ -483,15 +454,20 @@ a:hover {
                 }
             }
 
-            // Pre-format strings for the template to avoid complex filter usage
-            $paramTypesStr = implode('</var> , <var class="parameter">', $paramTypes);
-            $returnTypesStr = implode(',', $returnTypes);
+            $returnTypesStr = implode(', ', $returnTypes);
+            $signatureStr = implode(', ', $paramTypesForSignature);
+
+            // Generate example SOAP request
+            $exampleRequest = $this->generateExampleRequest($methodName, $params);
 
             $methods[] = [
                 'name' => $methodName,
                 'returnTypesStr' => $returnTypesStr,
-                'paramTypesStr' => $paramTypesStr,
-                'description' => $method['description'] ?? ''
+                'signatureStr' => $signatureStr,
+                'description' => $method['description'] ?? '',
+                'hasParams' => count($params) > 0,
+                'params' => $params,
+                'exampleRequest' => $exampleRequest
             ];
         }
 
@@ -505,9 +481,32 @@ a:hover {
             'description' => $this->description,
             'selfUrl' => $this->getSelfUrl(),
             'methods' => $methods,
-            'warningNamespace' => $this->warningNamespace === true || $this->namespace === 'http://example.org/',
-            'css' => $css
+            'warningNamespace' => $this->warningNamespace === true || $this->namespace === 'http://example.org/'
         ]);
+    }
+
+    /**
+     * Generate example SOAP request for a method
+     *
+     * @param string $methodName Method name
+     * @param array $params Parameters array
+     * @return string Example SOAP request XML
+     */
+    private function generateExampleRequest(string $methodName, array $params): string
+    {
+        $xml = '&lt;soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"&gt;' . "\n";
+        $xml .= '  &lt;soap:Body&gt;' . "\n";
+        $xml .= '    &lt;' . htmlspecialchars($methodName) . ' xmlns="' . htmlspecialchars($this->namespace) . '"&gt;' . "\n";
+
+        foreach ($params as $param) {
+            $xml .= '      &lt;' . htmlspecialchars($param['name']) . '&gt;...&lt;/' . htmlspecialchars($param['name']) . '&gt;' . "\n";
+        }
+
+        $xml .= '    &lt;/' . htmlspecialchars($methodName) . '&gt;' . "\n";
+        $xml .= '  &lt;/soap:Body&gt;' . "\n";
+        $xml .= '&lt;/soap:Envelope&gt;';
+
+        return $xml;
     }
 
     private function getSelfUrl()

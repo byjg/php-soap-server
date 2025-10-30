@@ -1,51 +1,574 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<title>{{ classname }} WebService</title>
-<meta name="generator" content="PEAR::Services_Webservice" />
-<meta http-equiv="content-type" content="text/html; charset=utf-8">
-<style type="text/css">
-{{ css }}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ classname }} SOAP Web Service - API Documentation</title>
+    <meta name="description" content="Complete documentation for {{ classname }} SOAP Web Service with interactive examples and technical specifications">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2d7a3e;
+            --primary-light: #4caf50;
+            --primary-dark: #1b5e20;
+            --accent: #81c784;
+            --bg-light: #f5f5f5;
+            --bg-white: #ffffff;
+            --text-primary: #212121;
+            --text-secondary: #616161;
+            --text-muted: #9e9e9e;
+            --border: #e0e0e0;
+            --code-bg: #263238;
+            --code-text: #aed581;
+            --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: linear-gradient(135deg, var(--bg-light) 0%, #e8f5e9 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+            color: white;
+            padding: 40px 0;
+            box-shadow: var(--shadow-lg);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #c8e6c9;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+            font-weight: 300;
+        }
+
+        /* Navigation */
+        nav {
+            background: var(--bg-white);
+            padding: 15px 0;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 99;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        nav a {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        nav a:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        /* Main Content */
+        main {
+            padding: 40px 0;
+        }
+
+        section {
+            background: var(--bg-white);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+            animation: fadeIn 0.5s ease;
+            scroll-margin-top: 80px;
+        }
+
+        section:first-of-type {
+            margin-top: 30px;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h2 {
+            color: var(--primary-dark);
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid var(--accent);
+        }
+
+        h3 {
+            color: var(--primary);
+            font-size: 1.3rem;
+            margin: 25px 0 15px 0;
+        }
+
+        /* Operation Cards */
+        .operation {
+            background: linear-gradient(135deg, #fafafa 0%, white 100%);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .operation:hover {
+            border-color: var(--primary-light);
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .operation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .operation-name {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            font-family: 'Courier New', monospace;
+        }
+
+        .operation-badge {
+            background: var(--primary-light);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .operation-description {
+            color: var(--text-secondary);
+            margin: 15px 0;
+            font-size: 1.05rem;
+        }
+
+        .operation-signature {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            overflow-x: auto;
+            position: relative;
+            margin-top: 15px;
+        }
+
+        .operation-details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .operation.expanded .operation-details {
+            max-height: 2000px;
+        }
+
+        .expand-icon {
+            transition: transform 0.3s ease;
+            font-size: 1.2rem;
+            color: var(--primary);
+        }
+
+        .operation.expanded .expand-icon {
+            transform: rotate(180deg);
+        }
+
+        /* Parameters Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--accent);
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: var(--bg-light);
+        }
+
+        /* Copy Button */
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--primary-light);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .copy-btn.copied {
+            background: var(--primary-dark);
+        }
+
+        /* Links */
+        .link-card {
+            display: inline-block;
+            background: var(--primary-light);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            margin: 10px 10px 10px 0;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+        }
+
+        .link-card:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Warning Box */
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 6px;
+        }
+
+        .warning strong {
+            display: block;
+            margin-bottom: 10px;
+            color: #856404;
+        }
+
+        /* Info Box */
+        .info {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 6px;
+            color: #0d47a1;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--code-bg);
+            color: white;
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 40px;
+        }
+
+        footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            nav ul {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .operation-header {
+                flex-direction: column;
+            }
+
+            section {
+                padding: 20px;
+            }
+
+            table {
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Syntax highlighting */
+        .keyword { color: #c792ea; }
+        .type { color: #82aaff; }
+        .function { color: #ffcb6b; }
+        .param { color: #eeffff; }
+    </style>
 </head>
 <body>
-<div id="header">
-<h1>{{ classname }}</h1>
-<p>{{ description }}</p>
-</div>
+    <header>
+        <div class="container">
+            <h1>🌐 {{ classname }}</h1>
+            <p>{{ description }}</p>
+        </div>
+    </header>
 
-<p>The following operations are supported. For a formal definition, please review the <a href="{{ selfUrl }}?WSDL">Service Description</a>.</p>
+    <nav>
+        <div class="container">
+            <ul>
+                <li><a href="#overview">Overview</a></li>
+                <li><a href="#operations">Operations</a></li>
+                <li><a href="#resources">Resources</a></li>
+                {% if warningNamespace %}
+                <li><a href="#configuration">Configuration</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
 
-<ul>
-{% for method in methods %}
-<li>
-<samp>
-<var class="returnedValue">{{ method.returnTypesStr }}</var>
-<b class="functionName">{{ method.name }}</b>
-( <var class="parameter">{{ method.paramTypesStr }}</var> )
-</samp>
-{% if method.description %}
-<br /><span class="description">{{ method.description }}</span>
-{% endif %}
-</li>
-{% endfor %}
-</ul>
+    <main class="container">
+        <section id="overview">
+            <h2>📋 Service Overview</h2>
+            <p>Welcome to the {{ classname }} SOAP Web Service documentation. This page provides comprehensive information about available operations, parameters, and integration guidelines.</p>
 
-<p><a href="{{ selfUrl }}?DISCO">DISCO</a> makes it possible for clients to reflect against endpoints to discover services and their associated <acronym title="Web Service Description Language">WSDL</acronym> documents.</p>
+            <div class="info">
+                <strong>💡 Getting Started</strong>
+                The following operations are supported. For a formal definition, please review the Service Description (WSDL). Click on any operation below to view detailed parameters and usage examples.
+            </div>
 
-{% if warningNamespace %}
-<p class="warning"><strong>This web service is using http://example.org/ as its default namespace.<br />
-Recommendation: Change the default namespace before the <acronym title="eXtensible Markup Language">XML</acronym> Web service is made public.</strong></p>
+            <div style="margin-top: 20px;">
+                <a href="{{ selfUrl }}?WSDL" class="link-card">📄 View WSDL</a>
+                <a href="{{ selfUrl }}?DISCO" class="link-card">🔍 Discovery (DISCO)</a>
+            </div>
+        </section>
 
-<p>Each XML Web service needs a unique namespace in order for client applications to distinguish it from other services on the Web. http://example.org/ is available for XML Web services that are under development, but published XML Web services should use a more permanent namespace.<br />
-Your XML Web service should be identified by a namespace that you control. For example, you can use your company's Internet domain name as part of the namespace. Although many XML Web service namespaces look like <acronym title="Uniform Resource Locators">URLs</acronym>, they need not point to actual resources on the Web. (XML Web service namespaces are <acronym title="Uniform Resouce Identifiers">URIs</acronym>.)</p>
+        <section id="operations">
+            <h2>⚙️ Available Operations</h2>
 
-<p>For more details on XML namespaces, see the <acronym title="World Wide Web Consortium">W3C</acronym> recommendation on <a href="http://www.w3.org/TR/REC-xml-names/">Namespaces in XML</a>.<br />
-For more details on <acronym title="Web Service Description Language">WSDL</acronym>, see the <a href="http://www.w3.org/TR/wsdl">WSDL Specification</a>.<br />
-For more details on URIs, see <a href="http://www.ietf.org/rfc/rfc2396.txt"><acronym title="Request For Comment">RFC</acronym> 2396</a>.</p>
-<p><small>Powered by PEAR <a href="http://pear.php.net/">http://pear.php.net</a></small></p>
-{% endif %}
+            {% for method in methods %}
+            <div class="operation" onclick="toggleOperation(this)">
+                <div class="operation-header">
+                    <div style="flex: 1;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span class="operation-name">{{ method.name }}</span>
+                            <span class="expand-icon">▼</span>
+                        </div>
+                        {% if method.description %}
+                        <p class="operation-description">{{ method.description }}</p>
+                        {% endif %}
+                    </div>
+                    <span class="operation-badge">POST</span>
+                </div>
 
+                <div class="operation-signature">
+                    <button class="copy-btn" onclick="copySignature(event, this)">Copy</button>
+                    <code><span class="type">{{ method.returnTypesStr }}</span> <span class="function">{{ method.name }}</span>(<span class="param">{{ method.signatureStr }}</span>)</code>
+                </div>
+
+                <div class="operation-details">
+                    {% if method.hasParams %}
+                    <h3>Parameters</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Required</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for param in method.params %}
+                            <tr>
+                                <td><code>{{ param.name }}</code></td>
+                                <td>{{ param.type }}</td>
+                                <td>{{ param.required }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% endif %}
+
+                    <h3>Returns</h3>
+                    <p><strong>Type:</strong> <code>{{ method.returnTypesStr }}</code></p>
+
+                    <h3>Example Request</h3>
+                    <div class="operation-signature">
+                        <button class="copy-btn" onclick="copySignature(event, this)">Copy</button>
+                        <pre><code>{{ method.exampleRequest }}</code></pre>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </section>
+
+        <section id="resources">
+            <h2>📚 Additional Resources</h2>
+
+            <h3>Service Discovery</h3>
+            <p>DISCO makes it possible for clients to reflect against endpoints to discover services and their associated WSDL documents.</p>
+            <a href="{{ selfUrl }}?DISCO" class="link-card">Access DISCO Document</a>
+
+            <h3>Technical Specifications</h3>
+            <ul style="margin-top: 15px; line-height: 2;">
+                <li>📖 <a href="http://www.w3.org/TR/REC-xml-names/" style="color: var(--primary);">W3C Namespaces in XML</a></li>
+                <li>📖 <a href="http://www.w3.org/TR/wsdl" style="color: var(--primary);">WSDL Specification</a></li>
+                <li>📖 <a href="http://www.ietf.org/rfc/rfc2396.txt" style="color: var(--primary);">RFC 2396 - URIs</a></li>
+            </ul>
+        </section>
+
+        {% if warningNamespace %}
+        <section id="configuration">
+            <h2>⚙️ Configuration & Best Practices</h2>
+
+            <div class="warning">
+                <strong>⚠️ Important: Default Namespace Configuration</strong>
+                This web service is currently using <code>http://example.org/</code> as its default namespace.
+                <br><br>
+                <strong>Recommendation:</strong> Change the default namespace before the XML Web service is made public.
+                <br><br>
+                Each XML Web service needs a unique namespace in order for client applications to distinguish it from other services on the Web. While <code>http://example.org/</code> is available for services under development, published XML Web services should use a more permanent namespace.
+                <br><br>
+                Your XML Web service should be identified by a namespace that you control. For example, you can use your company's Internet domain name as part of the namespace. Although many XML Web service namespaces look like URLs, they need not point to actual resources on the Web (XML Web service namespaces are URIs).
+            </div>
+
+            <h3>Integration Guidelines</h3>
+            <div class="info">
+                <strong>🔌 Client Integration</strong>
+                <ol style="margin-top: 10px; margin-left: 20px;">
+                    <li>Download the WSDL document from the service endpoint</li>
+                    <li>Generate client stubs using your preferred SOAP library</li>
+                    <li>Configure the endpoint URL in your application</li>
+                    <li>Implement error handling for SOAP faults</li>
+                    <li>Test all operations in a development environment before production</li>
+                </ol>
+            </div>
+        </section>
+        {% endif %}
+    </main>
+
+    <footer>
+        <div class="container">
+            <p style="margin-top: 10px; opacity: 0.8;">© 2025 {{ classname }} SOAP Web Service</p>
+        </div>
+    </footer>
+
+    <script>
+        // Toggle operation details
+        function toggleOperation(element) {
+            // Prevent toggle when clicking copy button
+            if (event.target.closest('.copy-btn')) {
+                return;
+            }
+            element.classList.toggle('expanded');
+        }
+
+        // Copy signature to clipboard
+        function copySignature(event, button) {
+            event.stopPropagation();
+            const codeBlock = button.nextElementSibling;
+            const text = codeBlock.textContent;
+
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                button.classList.add('copied');
+
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.classList.remove('copied');
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+                alert('Failed to copy to clipboard');
+            });
+        }
+
+        // Smooth scrolling for navigation
+        document.querySelectorAll('nav a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('section').forEach(section => {
+            observer.observe(section);
+        });
+    </script>
 </body>
 </html>
