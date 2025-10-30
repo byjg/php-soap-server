@@ -4,6 +4,7 @@ namespace ByJG\SoapServer;
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 
+use ByJG\JinjaPhp\Loader\FileSystemLoader;
 use DOMDocument;
 use DOMElement;
 use Exception;
@@ -464,72 +465,49 @@ a:hover {
 }
 ';
 
-        echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html>
-<head>
-<title>' . $this->classname . ' WebService</title>
-<meta name="generator" content="PEAR::Services_Webservice" />
-<meta http-equiv="content-type" content="text/html; charset=utf-8">
-<style type="text/css">
-' . $css . '</style> </head> <body> <div id="header">'.
-        '<h1>' . $this->classname . '</h1> <p>' .
-        htmlspecialchars($this->description)
-        . '</p></div><p>The following operations are supported. ' .
-        'For a formal definition, please review the <a href="' .
-        htmlentities($this->getSelfUrl()) . '?WSDL">Service Description</a>.</p>
-<ul>';
-
+        // Prepare methods data for template
+        $methods = [];
         foreach ($this->wsdlStruct[$this->classname]['method'] as $methodName => $method) {
-            $paramValue = array();
+            $paramTypes = [];
             foreach ($method['var'] as $methodVars) {
                 if (isset($methodVars['param'])) {
-                    $paramValue[] = $methodVars['type']
+                    $paramTypes[] = $methodVars['type']
                                      . str_repeat('[]', $methodVars['length']);
                 }
             }
-            $returnValue = array();
+            $returnTypes = [];
             foreach ($method['var'] as $methodVars) {
                 if (isset($methodVars['return'])) {
-                    $returnValue[] = $methodVars['type']
+                    $returnTypes[] = $methodVars['type']
                                      . str_repeat('[]', $methodVars['length']);
                 }
             }
-            echo sprintf(
-                '<li><samp><var class="returnedValue">%s</var> '
-                . '<b class="functionName">%s</b>'
-                . '( <var class="parameter">%s</var> )</samp>%s</li>',
-                implode(',', $returnValue),
-                $methodName,
-                implode(
-                    '</var> , <var class="parameter">',
-                    $paramValue
-                ), ((empty($method['description'])) ?
-                    '' : ('<br /><span class="description">'
-                    . htmlspecialchars($method['description']) . '</span>'))
-            );
+
+            // Pre-format strings for the template to avoid complex filter usage
+            $paramTypesStr = implode('</var> , <var class="parameter">', $paramTypes);
+            $returnTypesStr = implode(',', $returnTypes);
+
+            $methods[] = [
+                'name' => $methodName,
+                'returnTypesStr' => $returnTypesStr,
+                'paramTypesStr' => $paramTypesStr,
+                'description' => $method['description'] ?? ''
+            ];
         }
-        echo '</ul>
-<p><a href="' . htmlentities($this->getSelfUrl()) . '?DISCO">DISCO</a> makes it possible for clients to reflect against endpoints to discover services and their associated <acronym title="Web Service Description Language">WSDL</acronym> documents.</p>';
 
-        if ($this->warningNamespace == true
-            || $this->namespace == 'http://example.org/'
-        ) {
-            echo '
-<p class="warning"><strong>This web service is using http://example.org/ as its default namespace.<br />
-Recommendation: Change the default namespace before the <acronym title="eXtensible Markup Language">XML</acronym> Web service is made public.</strong></p>
+        // Render template
+        $templatePath = __DIR__ . '/../templates';
+        $loader = new FileSystemLoader($templatePath);
+        $template = $loader->getTemplate('service-info.html');
 
-<p>Each XML Web service needs a unique namespace in order for client applications to distinguish it from other services on the Web. http://example.org/ is available for XML Web services that are under development, but published XML Web services should use a more permanent namespace.<br />
-Your XML Web service should be identified by a namespace that you control. For example, you can use your company`s Internet domain name as part of the namespace. Although many XML Web service namespaces look like <acronym title="Uniform Resource Locators">URLs</acronym>, they need not point to actual resources on the Web. (XML Web service namespaces are <acronym title="Uniform Resouce Identifiers">URIs</acronym>.)</p>
-
-<p>For more details on XML namespaces, see the <acronym title="World Wide Web Consortium">W3C</acronym> recommendation on <a href="http://www.w3.org/TR/REC-xml-names/">Namespaces in XML</a>.<br />
-For more details on <acronym title="Web Service Description Language">WSDL</acronym>, see the <a href="http://www.w3.org/TR/wsdl">WSDL Specification</a>.<br />
-For more details on URIs, see <a href="http://www.ietf.org/rfc/rfc2396.txt"><acronym title="Request For Comment">RFC</acronym> 2396</a>.</p>
-<p><small>Powered by PEAR <a href="http://pear.php.net/">http://pear.php.net</a></small></p>
-';
-
-        }
-        echo '</body></html>';
+        echo $template->render([
+            'classname' => $this->classname,
+            'description' => $this->description,
+            'selfUrl' => $this->getSelfUrl(),
+            'methods' => $methods,
+            'warningNamespace' => $this->warningNamespace === true || $this->namespace === 'http://example.org/',
+            'css' => $css
+        ]);
     }
 
     private function getSelfUrl()
