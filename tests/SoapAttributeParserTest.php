@@ -96,7 +96,14 @@ class SoapAttributeParserTest extends TestCase
         // Use public properties
         $this->assertEquals('http://example.com/calculator', $handler->namespace);
         $this->assertEquals('A simple calculator service', $handler->description);
-        $this->assertEquals(['soap_version' => SOAP_1_2], $handler->soapServerOptions);
+        $this->assertEquals(
+            [
+                'soap_version' => SOAP_1_2,
+                'uri' => 'http://example.com/calculator',
+                'encoding' => 1
+            ],
+            $handler->soapServerOptions
+        );
     }
 
     public function testCanParseOperations(): void

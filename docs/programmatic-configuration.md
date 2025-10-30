@@ -38,14 +38,14 @@ Defines a single SOAP operation.
 
 ```php
 use ByJG\SoapServer\SoapOperationConfig;
-use ByJG\SoapServer\SoapParameter;
+use ByJG\SoapServer\SoapParameterConfig;
 use ByJG\SoapServer\SoapType;
 
 $operation = new SoapOperationConfig();
 $operation->description = 'Adds two numbers';
 $operation->args = [
-    new SoapParameter('a', SoapType::Integer),
-    new SoapParameter('b', SoapType::Integer)
+    new SoapParameterConfig('a', SoapType::Integer),
+    new SoapParameterConfig('b', SoapType::Integer)
 ];
 $operation->returnType = SoapType::Integer;
 $operation->executor = function(array $params) {
@@ -53,15 +53,19 @@ $operation->executor = function(array $params) {
 };
 ```
 
-### SoapParameter
+### SoapParameterConfig
 
-Defines a parameter for an operation.
+Defines a parameter for an operation (programmatic configuration).
+
+:::info
+For attribute-based configuration, use `#[SoapParameter]` attribute instead.
+:::
 
 ```php
-use ByJG\SoapServer\SoapParameter;
+use ByJG\SoapServer\SoapParameterConfig;
 use ByJG\SoapServer\SoapType;
 
-$param = new SoapParameter(
+$param = new SoapParameterConfig(
     name: 'username',           // Parameter name
     type: SoapType::String,     // Parameter type
     minOccurs: 1,               // Minimum occurrences (0 = optional)
@@ -99,15 +103,15 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 use ByJG\SoapServer\SoapHandler;
 use ByJG\SoapServer\SoapOperationConfig;
-use ByJG\SoapServer\SoapParameter;
+use ByJG\SoapServer\SoapParameterConfig;
 use ByJG\SoapServer\SoapType;
 
 // Define the add operation
 $addOperation = new SoapOperationConfig();
 $addOperation->description = 'Adds two numbers together';
 $addOperation->args = [
-    new SoapParameter('a', SoapType::Integer, 1, 1),
-    new SoapParameter('b', SoapType::Integer, 1, 1)
+    new SoapParameterConfig('a', SoapType::Integer, 1, 1),
+    new SoapParameterConfig('b', SoapType::Integer, 1, 1)
 ];
 $addOperation->returnType = SoapType::Integer;
 $addOperation->executor = function(array $params) {
@@ -118,8 +122,8 @@ $addOperation->executor = function(array $params) {
 $subtractOperation = new SoapOperationConfig();
 $subtractOperation->description = 'Subtracts second number from first';
 $subtractOperation->args = [
-    new SoapParameter('a', SoapType::Integer),
-    new SoapParameter('b', SoapType::Integer)
+    new SoapParameterConfig('a', SoapType::Integer),
+    new SoapParameterConfig('b', SoapType::Integer)
 ];
 $subtractOperation->returnType = SoapType::Integer;
 $subtractOperation->executor = function(array $params) {
@@ -130,8 +134,8 @@ $subtractOperation->executor = function(array $params) {
 $greetOperation = new SoapOperationConfig();
 $greetOperation->description = 'Greets a person';
 $greetOperation->args = [
-    new SoapParameter('name', SoapType::String, 1, 1),
-    new SoapParameter('title', SoapType::String, 0, 1)  // Optional
+    new SoapParameterConfig('name', SoapType::String, 1, 1),
+    new SoapParameterConfig('title', SoapType::String, 0, 1)  // Optional
 ];
 $greetOperation->returnType = SoapType::String;
 $greetOperation->executor = function(array $params) {
@@ -172,9 +176,9 @@ class User
 $createUserOperation = new SoapOperationConfig();
 $createUserOperation->description = 'Creates a new user';
 $createUserOperation->args = [
-    new SoapParameter('username', SoapType::String),
-    new SoapParameter('email', SoapType::String),
-    new SoapParameter('age', SoapType::Integer)
+    new SoapParameterConfig('username', SoapType::String),
+    new SoapParameterConfig('email', SoapType::String),
+    new SoapParameterConfig('age', SoapType::Integer)
 ];
 $createUserOperation->returnType = User::class;  // Use class name as string
 $createUserOperation->executor = function(array $params) {
@@ -200,7 +204,7 @@ Use `maxOccurs: -1` for unbounded arrays:
 $operation = new SoapOperationConfig();
 $operation->description = 'Sums an array of numbers';
 $operation->args = [
-    new SoapParameter(
+    new SoapParameterConfig(
         name: 'numbers',
         type: SoapType::ArrayOfInteger,
         minOccurs: 1,

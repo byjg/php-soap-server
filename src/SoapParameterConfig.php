@@ -2,7 +2,15 @@
 
 namespace ByJG\SoapServer;
 
-class SoapParameter
+/**
+ * Configuration class for SOAP operation parameters (programmatic API)
+ *
+ * This class is used for programmatic service configuration.
+ * For attribute-based configuration, use #[SoapParameter] attribute instead.
+ *
+ * @see \ByJG\SoapServer\Attributes\SoapParameter For attribute-based configuration
+ */
+class SoapParameterConfig
 {
     // Argument name
     public string $name;

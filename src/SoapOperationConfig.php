@@ -7,8 +7,8 @@ class SoapOperationConfig
     // Soap Description
     public string $description;
 
-    // Array of SoapArg objects defining method arguments
-    // Example: [new SoapArg('name', SoapType::String), new SoapArg('age', SoapType::Int, 0)]
+    // Array of SoapParameterConfig objects defining method arguments
+    // Example: [new SoapParameterConfig('name', SoapType::String), new SoapParameterConfig('age', SoapType::Integer, 0)]
     public array $args = [];
 
     // Return type of the method:

@@ -68,13 +68,13 @@ $handler->handle();
 ```php
 <?php
 
-use ByJG\SoapServer\{SoapHandler, SoapOperationConfig, SoapParameter, SoapType};
+use ByJG\SoapServer\{SoapHandler, SoapOperationConfig, SoapParameterConfig, SoapType};
 
 $addOperation = new SoapOperationConfig();
 $addOperation->description = 'Adds two numbers';
 $addOperation->args = [
-    new SoapParameter('a', SoapType::Integer),
-    new SoapParameter('b', SoapType::Integer)
+    new SoapParameterConfig('a', SoapType::Integer),
+    new SoapParameterConfig('b', SoapType::Integer)
 ];
 $addOperation->returnType = SoapType::Integer;
 $addOperation->executor = function(array $params) {

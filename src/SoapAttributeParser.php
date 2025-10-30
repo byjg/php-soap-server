@@ -154,12 +154,12 @@ class SoapAttributeParser
     }
 
     /**
-     * Parse a single parameter into SoapParameter
+     * Parse a single parameter into SoapParameterConfig
      *
      * @param ReflectionParameter $param
-     * @return SoapParameter
+     * @return SoapParameterConfig
      */
-    private function parseParameter(ReflectionParameter $param): SoapParameter
+    private function parseParameter(ReflectionParameter $param): SoapParameterConfig
     {
         // Check for SoapParameterAttribute
         $paramAttributes = $param->getAttributes(SoapParameterAttribute::class);
@@ -187,7 +187,7 @@ class SoapAttributeParser
             $maxOccurs = 1;
         }
 
-        return new SoapParameter(
+        return new SoapParameterConfig(
             name: $param->getName(),
             type: $type,
             minOccurs: $minOccurs,
