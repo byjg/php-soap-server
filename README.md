@@ -6,15 +6,18 @@
 
 # byjg/soap-server
 
-A lightweight and modern SOAP server implementation for PHP
+A lightweight and modern SOAP server implementation for PHP 8.1+
 
 ## Features
 
-TODO: Describe the main features of this SOAP server library
-
-- Feature 1
-- Feature 2
-- Feature 3
+- 🚀 **Modern PHP 8.1+ Attributes**: Use PHP attributes to define SOAP services declaratively
+- 📝 **Auto-generated WSDL**: Automatic WSDL generation from your service definitions
+- 🎨 **Beautiful Documentation UI**: Modern, interactive HTML documentation with Jinja templates
+- 🔧 **Flexible Configuration**: Support for both attribute-based and programmatic configuration
+- 📊 **Type Safety**: Full support for complex types, arrays, and optional parameters
+- 🌐 **SOAP 1.1 & 1.2**: Support for both SOAP versions
+- 🎯 **Discovery Support**: Built-in DISCO (Discovery) document generation
+- 📱 **Responsive Design**: Mobile-friendly service documentation interface
 
 ## Installation
 
@@ -22,25 +25,82 @@ TODO: Describe the main features of this SOAP server library
 composer require byjg/soap-server
 ```
 
-## Usage
+## Quick Start
 
-TODO: Add usage examples
+### Using PHP Attributes (Recommended)
 
 ```php
 <?php
-require 'vendor/autoload.php';
 
-use ByJG\SoapServer\SoapServer;
+use ByJG\SoapServer\Attributes\{SoapService, SoapOperation, SoapParameter};
+use ByJG\SoapServer\SoapAttributeParser;
 
-// Example usage
+#[SoapService(
+    serviceName: 'CalculatorService',
+    namespace: 'http://example.com/calculator',
+    description: 'A simple calculator web service'
+)]
+class Calculator
+{
+    #[SoapOperation(description: 'Adds two numbers together')]
+    public function add(
+        #[SoapParameter(description: 'First number')] int $a,
+        #[SoapParameter(description: 'Second number')] int $b
+    ): int {
+        return $a + $b;
+    }
+
+    #[SoapOperation(description: 'Subtracts second from first')]
+    public function subtract(int $a, int $b): int
+    {
+        return $a - $b;
+    }
+}
+
+// Start the service
+$parser = new SoapAttributeParser();
+$handler = $parser->parse(Calculator::class);
+$handler->handle();
 ```
 
-## Dependencies
+### Using Programmatic Configuration
 
-```mermaid
-flowchart TD
-    byjg/soap-server
+```php
+<?php
+
+use ByJG\SoapServer\{SoapHandler, SoapOperationConfig, SoapParameter, SoapType};
+
+$addOperation = new SoapOperationConfig();
+$addOperation->description = 'Adds two numbers';
+$addOperation->args = [
+    new SoapParameter('a', SoapType::Integer),
+    new SoapParameter('b', SoapType::Integer)
+];
+$addOperation->returnType = SoapType::Integer;
+$addOperation->executor = function(array $params) {
+    return $params['a'] + $params['b'];
+};
+
+$handler = new SoapHandler(
+    soapItems: ['add' => $addOperation],
+    serviceName: 'CalculatorService'
+);
+$handler->handle();
 ```
+
+## Running the Service
+
+Start PHP's built-in web server:
+
+```bash
+php -S localhost:8080 calculator.php
+```
+
+Then access:
+- **Service Documentation**: [http://localhost:8080](http://localhost:8080)
+- **WSDL**: [http://localhost:8080?wsdl](http://localhost:8080?wsdl)
+- **DISCO**: [http://localhost:8080?DISCO](http://localhost:8080?disco)
+
 
 ## Running Tests
 
@@ -57,7 +117,20 @@ composer psalm
 
 ## Documentation
 
-TODO: Add link to documentation once available
+Comprehensive documentation is available:
+
+- [Getting Started](docs/getting-started.md) - Create your first SOAP service
+- [Using Attributes](docs/using-attributes.md) - Attribute-based configuration guide
+- [Programmatic Configuration](docs/programmatic-configuration.md) - API-based configuration
+- [Complex Types](docs/complex-types.md) - Working with custom classes and objects
+- [Templates](docs/templates.md) - Customizing the service documentation UI
+
+## Dependencies
+
+```mermaid
+flowchart TD
+    byjg/soap-server --> byjg/jinja-php
+```
 
 ----
 [Open source ByJG](https://opensource.byjg.com)
