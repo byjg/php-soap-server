@@ -164,23 +164,34 @@ class SoapAttributeParser
         // Check for SoapParameterAttribute
         $paramAttributes = $param->getAttributes(SoapParameterAttribute::class);
         $typeOverride = null;
+        $minOccurs = null;
+        $maxOccurs = null;
 
         if (!empty($paramAttributes)) {
             $soapParamAttr = $paramAttributes[0]->newInstance();
             $typeOverride = $soapParamAttr->type;
+            $minOccurs = $soapParamAttr->minOccurs;
+            $maxOccurs = $soapParamAttr->maxOccurs;
         }
 
         // Get parameter type
         $type = $this->getParameterType($param, $typeOverride);
 
-        // Determine minOccurs (0 = optional, 1 = required)
-        $minOccurs = $param->isOptional() ? 0 : 1;
+        // Determine minOccurs (0 = optional, 1 = required) if not set by attribute
+        if ($minOccurs === null) {
+            $minOccurs = $param->isOptional() ? 0 : 1;
+        }
+
+        // Default maxOccurs to 1 if not set by attribute
+        if ($maxOccurs === null) {
+            $maxOccurs = 1;
+        }
 
         return new SoapParameter(
             name: $param->getName(),
             type: $type,
             minOccurs: $minOccurs,
-            maxOccurs: 1
+            maxOccurs: $maxOccurs
         );
     }
 

@@ -15,7 +15,8 @@ use Attribute;
  * Example:
  * ```php
  * public function greet(
- *     #[SoapParameter(description: 'The name to greet')] string $name
+ *     #[SoapParameter(description: 'The name to greet', minOccurs: 1)] string $name,
+ *     #[SoapParameter(description: 'Optional title', minOccurs: 0)] ?string $title = null
  * ): string {
  *     return "Hello, $name!";
  * }
@@ -26,10 +27,14 @@ class SoapParameter
 {
     /**
      * @param string $description A description of the parameter
+     * @param int|null $minOccurs Minimum occurrences (0 = optional, 1 = required)
+     * @param int|null $maxOccurs Maximum occurrences (1 = single value, -1 = unbounded array)
      * @param string|null $type Override the type (useful for complex types)
      */
     public function __construct(
         public readonly string $description = '',
+        public readonly ?int $minOccurs = null,
+        public readonly ?int $maxOccurs = null,
         public readonly ?string $type = null
     ) {
     }

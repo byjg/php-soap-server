@@ -65,7 +65,7 @@ $param = new SoapParameter(
     name: 'username',           // Parameter name
     type: SoapType::String,     // Parameter type
     minOccurs: 1,               // Minimum occurrences (0 = optional)
-    maxOccurs: 1                // Maximum occurrences
+    maxOccurs: 1                // Maximum occurrences (-1 = unbounded)
 );
 ```
 
@@ -194,7 +194,7 @@ $handler->handle();
 
 ## Arrays and Collections
 
-Use `maxOccurs: 'unbounded'` for unlimited arrays:
+Use `maxOccurs: -1` for unbounded arrays:
 
 ```php
 $operation = new SoapOperationConfig();
@@ -204,7 +204,7 @@ $operation->args = [
         name: 'numbers',
         type: SoapType::ArrayOfInteger,
         minOccurs: 1,
-        maxOccurs: 'unbounded'  // Unlimited occurrences
+        maxOccurs: -1  // -1 = unbounded/unlimited occurrences
     )
 ];
 $operation->returnType = SoapType::Integer;

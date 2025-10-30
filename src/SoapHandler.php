@@ -871,7 +871,8 @@ class SoapHandler
 
                     // Add minOccurs and maxOccurs
                     $element->setAttribute('minOccurs', (string)($var['minOccurs'] ?? 1));
-                    $element->setAttribute('maxOccurs', (string)($var['maxOccurs'] ?? 1));
+                    $maxOccurs = $var['maxOccurs'] ?? 1;
+                    $element->setAttribute('maxOccurs', $maxOccurs === -1 ? 'unbounded' : (string)$maxOccurs);
 
                     $sequence->appendChild($element);
                 }
@@ -908,7 +909,8 @@ class SoapHandler
                         $element->setAttribute('minOccurs', (string)$cpValue['minOccurs']);
                     }
                     if (isset($cpValue['maxOccurs'])) {
-                        $element->setAttribute('maxOccurs', (string)$cpValue['maxOccurs']);
+                        $maxOccurs = $cpValue['maxOccurs'];
+                        $element->setAttribute('maxOccurs', $maxOccurs === -1 ? 'unbounded' : (string)$maxOccurs);
                     }
 
                     $sequence->appendChild($element);

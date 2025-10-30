@@ -15,17 +15,17 @@ class SoapParameter
     // Minimum occurrences (default 1 = required, 0 = optional)
     public int $minOccurs = 1;
 
-    // Maximum occurrences (default 1, use 'unbounded' for unlimited)
-    public int|string $maxOccurs = 1;
+    // Maximum occurrences (default 1, use -1 for unbounded/unlimited)
+    public int $maxOccurs = 1;
 
     /**
      * @param string $name Argument name
      * @param SoapType|string $type SoapType enum OR class name (e.g., MyClass::class)
      * @param int $minOccurs Minimum occurrences (0 = optional, 1+ = required)
-     * @param int|string $maxOccurs Maximum occurrences (1 or 'unbounded')
+     * @param int $maxOccurs Maximum occurrences (1 or -1 for unbounded)
      * @throws \InvalidArgumentException if string type is not a valid class
      */
-    public function __construct(string $name, SoapType|string $type, int $minOccurs = 1, int|string $maxOccurs = 1)
+    public function __construct(string $name, SoapType|string $type, int $minOccurs = 1, int $maxOccurs = 1)
     {
         $this->name = $name;
 

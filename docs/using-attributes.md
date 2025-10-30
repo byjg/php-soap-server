@@ -100,7 +100,7 @@ public function greet(
 |-----------|------|----------|---------|-------------|
 | `description` | string | No | `''` | Parameter description for documentation |
 | `minOccurs` | int | No | `1` | Minimum occurrences (0 = optional, 1 = required) |
-| `maxOccurs` | int | No | `1` | Maximum occurrences (use for arrays) |
+| `maxOccurs` | int | No | `1` | Maximum occurrences (-1 = unbounded/unlimited) |
 
 ## Type Support
 
@@ -136,7 +136,7 @@ Use array type hints with `maxOccurs`:
 
 ```php
 public function getUsers(
-    #[SoapParameter(maxOccurs: 'unbounded')]  // 'unbounded' for unlimited
+    #[SoapParameter(maxOccurs: -1)]  // -1 for unbounded/unlimited
     array $ids
 ): array {
     // Returns array of users
