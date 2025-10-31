@@ -110,6 +110,7 @@ class SoapAttributeParser
             // Create SoapOperationConfig
             $config = new SoapOperationConfig();
             $config->description = $soapOperation->description;
+            $config->contentType = $soapOperation->contentType;
 
             // Parse parameters into SoapParameter array
             $config->args = $this->parseParameters($method);

@@ -5,9 +5,13 @@ namespace ByJG\SoapServer;
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 
 use ByJG\JinjaPhp\Loader\FileSystemLoader;
+use ByJG\WebRequest\Exception\MessageException;
+use ByJG\WebRequest\Psr7\MemoryStream;
+use ByJG\WebRequest\Psr7\Response;
 use DOMDocument;
 use DOMElement;
 use Exception;
+use Psr\Http\Message\ResponseInterface;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionObject;
@@ -249,27 +253,24 @@ class SoapHandler
      * handle
      *
      * @access public
-     * @return void
+     * @return ResponseInterface
      */
-    public function handle(): void
+    public function handle(): ResponseInterface
     {
         $this->intoStruct();
         switch (strtolower($_SERVER['QUERY_STRING'] ?? '')){
         case 'wsdl':
-            $this->handleWSDL();
-            break;
+            return $this->handleWSDL();
         case 'disco':
-            $this->handleDISCO();
-            break;
+            return $this->handleDISCO();
         default:
             if (isset($_SERVER['HTTP_SOAPACTION'])) {
-                $this->createServer();
+                return $this->createServer();
             } elseif (isset($_REQUEST['httpmethod'])) {
-               	$this->handleHTTP(); // by JG
+                return $this->handleHTTP(); // by JG
             } else {
-                $this->handleINFO();
+                return $this->handleINFO();
             }
-            break;
         }
     }
 
@@ -279,13 +280,19 @@ class SoapHandler
      * create the soap-server
      *
      * @access private
-     * @return void
+     * @return ResponseInterface
      */
-    private function createServer()
+    private function createServer(): ResponseInterface
     {
+        ob_start();
         $server = new SoapServer(null, $this->soapServerOptions);
         $server->setObject($this);
         $server->handle();
+        $output = ob_get_clean();
+
+        return (new Response(200))
+            ->withHeader('Content-Type', 'text/xml')
+            ->withBody(new MemoryStream($output));
     }
 
     // }}}
@@ -294,22 +301,28 @@ class SoapHandler
      * handle HTTP requests to the class (by JG)
      *
      * @access private
+     * @return ResponseInterface
+     * @throws MessageException
      */
-    private function handleHTTP(): void
+    private function handleHTTP(): ResponseInterface
     {
         $methodName = $_REQUEST["httpmethod"];
         $soapItem = $this->getSoapItem($methodName);
 
         if (!$soapItem) {
-            echo $this->_httpFailure . "Method does not exists";
-            exit;
+            return (new Response(400))
+                ->withHeader('Content-Type', 'text/plain')
+                ->withBody(new MemoryStream($this->httpFailure . "Method does not exists"));
         }
+
+        // Get the content type from the operation config
+        $contentType = $soapItem->contentType ?? 'text/plain';
 
         // Get parameters from SoapArg objects as associative array
         $paramValues = array();
         $missingParams = "";
         foreach ($soapItem->args as $soapArg) {
-            $paramValue = isset($_REQUEST[$soapArg->name]) ? $_REQUEST[$soapArg->name] : null;
+            $paramValue = $_REQUEST[$soapArg->name] ?? null;
             // Only report missing if minOccurs > 0 (required)
             if (is_null($paramValue) && $soapArg->minOccurs > 0) {
                 $missingParams .= (($missingParams == "") ? "" : ", ") . $soapArg->name;
@@ -320,29 +333,40 @@ class SoapHandler
         }
 
         if ($missingParams != "") {
-            echo $this->_httpFailure . "Missing params $missingParams";
-        } else {
-            try {
-                $result = call_user_func($soapItem->executor, $paramValues);
+            return (new Response(400))
+                ->withHeader('Content-Type', 'text/plain')
+                ->withBody(new MemoryStream($this->httpFailure . "Missing params $missingParams"));
+        }
 
-                if (is_array($result)) {
-                    $str = sizeof($result);
-                    foreach ($result as $line) {
-                        $str .= "|$line";
-                    }
-                    echo $this->_httpSuccess . "$str";
-                } elseif (is_object($result)) {
-                    echo $this->_httpFailure . "Return type is not supported";
-                } else {
-                    echo $this->_httpSuccess . $result;
+        try {
+            $result = call_user_func($soapItem->executor, $paramValues);
+
+            if (is_array($result)) {
+                $str = sizeof($result);
+                foreach ($result as $line) {
+                    $str .= "|$line";
                 }
-            } catch (Exception $ex) {
-                echo $this->_httpFailure . $ex->getMessage();
+                return (new Response(200))
+                    ->withHeader('Content-Type', $contentType)
+                    ->withBody(new MemoryStream($this->httpSuccess . "$str"));
+            } elseif (is_object($result)) {
+                return (new Response(400))
+                    ->withHeader('Content-Type', 'text/plain')
+                    ->withBody(new MemoryStream($this->httpFailure . "Return type is not supported"));
+            } else {
+                return (new Response(200))
+                    ->withHeader('Content-Type', $contentType)
+                    ->withBody(new MemoryStream($this->httpSuccess . $result));
             }
+        } catch (Exception $ex) {
+            return (new Response(500))
+                ->withHeader('Content-Type', 'text/plain')
+                ->withBody(new MemoryStream($this->httpFailure . $ex->getMessage()));
         }
     }
-    protected $_httpSuccess = "OK|";
-    protected $_httpFailure = "ERR|";
+
+    protected string $httpSuccess = "OK|";
+    protected string $httpFailure = "ERR|";
 
     // }}}
     // {{{ handleWSDL()
@@ -350,11 +374,11 @@ class SoapHandler
      * handle wsdl
      *
      * @access private
-     * @return void
+     * @return ResponseInterface
+     * @throws MessageException
      */
-    private function handleWSDL()
+    private function handleWSDL(): ResponseInterface
     {
-        header('Content-Type: text/xml');
         $this->wsdl = new DOMDocument('1.0', 'utf-8');
         $this->createWSDLDefinitions();
         $this->createWSDLTypes();
@@ -362,7 +386,10 @@ class SoapHandler
         $this->createWSDLPortType();
         $this->createWSDLBinding();
         $this->createWSDLService();
-        echo $this->wsdl->saveXML();
+
+        return (new Response(200))
+            ->withHeader('Content-Type', 'text/xml')
+            ->withBody(new MemoryStream($this->wsdl->saveXML()));
     }
 
     // }}}
@@ -371,11 +398,10 @@ class SoapHandler
      * handle disco
      *
      * @access private
-     * @return void
+     * @return ResponseInterface
      */
-    private function handleDISCO(): void
+    private function handleDISCO(): ResponseInterface
     {
-        header('Content-Type: text/xml');
         $disco = new DOMDocument('1.0', 'utf-8');
         $discoDiscovery = $disco->createElement('discovery');
         $discoDiscovery->setAttribute('xmlns:xsi', self::SOAP_XML_SCHEMA_INSTANCE);
@@ -396,7 +422,10 @@ class SoapHandler
         $discoContractRef->appendChild($discoSoap);
         $discoDiscovery->appendChild($discoContractRef);
         $disco->appendChild($discoDiscovery);
-        echo $disco->saveXML();
+
+        return (new Response(200))
+            ->withHeader('Content-Type', 'text/xml')
+            ->withBody(new MemoryStream($disco->saveXML()));
     }
 
     // }}}
@@ -405,12 +434,10 @@ class SoapHandler
      * handle info-site
      *
      * @access private
-     * @return void
+     * @return ResponseInterface
      */
-    private function handleINFO(): void
+    private function handleINFO(): ResponseInterface
     {
-        header('Content-Type: text/html');
-
         // Prepare methods data for template
         $methods = [];
         foreach ($this->wsdlStruct[$this->classname]['method'] as $methodName => $method) {
@@ -464,13 +491,17 @@ class SoapHandler
         $loader = new FileSystemLoader($templatePath);
         $template = $loader->getTemplate('service-info.html');
 
-        echo $template->render([
+        $html = $template->render([
             'classname' => $this->classname,
             'description' => $this->description,
             'selfUrl' => $this->getSelfUrl(),
             'methods' => $methods,
             'warningNamespace' => $this->warningNamespace === true || $this->namespace === 'http://example.org/'
         ]);
+
+        return (new Response(200))
+            ->withHeader('Content-Type', 'text/html')
+            ->withBody(new MemoryStream($html));
     }
 
     /**

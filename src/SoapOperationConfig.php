@@ -2,6 +2,8 @@
 
 namespace ByJG\SoapServer;
 
+use InvalidArgumentException;
+
 class SoapOperationConfig
 {
     // Soap Description
@@ -22,11 +24,15 @@ class SoapOperationConfig
     // Example: $soapItem->executor = function(array $params) { return $params['name']; };
     public mixed $executor;
 
+    // Content-Type for HTTP method responses (when using ?httpmethod parameter)
+    // Default is 'text/plain'. Can be set to 'application/json', 'application/xml', etc.
+    public string $contentType = 'text/plain';
+
     /**
      * Set the return type
      *
      * @param SoapType|string $returnType SoapType enum OR class name (e.g., MyClass::class)
-     * @throws \InvalidArgumentException if string type is not a valid class
+     * @throws InvalidArgumentException if string type is not a valid class
      */
     public function setReturnType(SoapType|string $returnType): void
     {
@@ -36,7 +42,7 @@ class SoapOperationConfig
         } else {
             // Using string - must be a valid class name or 'void'
             if ($returnType !== 'void' && !class_exists($returnType)) {
-                throw new \InvalidArgumentException(
+                throw new InvalidArgumentException(
                     "Return type '{$returnType}' must be a SoapType enum, 'void', or a valid class name. " .
                     "Use SoapType enum for simple types (e.g., SoapType::String, SoapType::ArrayOfInt)."
                 );
