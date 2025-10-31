@@ -9,6 +9,7 @@ use DOMDocument;
 use DOMElement;
 use Exception;
 use ReflectionClass;
+use ReflectionException;
 use ReflectionObject;
 use SoapServer;
 
@@ -139,18 +140,18 @@ class SoapHandler
      *
      * @access private
      */
-    const string SOAP_XML_SCHEMA_VERSION  = 'http://www.w3.org/2001/XMLSchema';
-    const string SOAP_XML_SCHEMA_INSTANCE = 'http://www.w3.org/2001/XMLSchema-instance';
-    const string SOAP_SCHEMA_ENCODING   = 'http://schemas.xmlsoap.org/soap/encoding/';
-    const string SOAP_XML_SCHEMA_MIME   = 'http://schemas.xmlsoap.org/wsdl/mime/';
-    const string SOAP_ENVELOP           = 'http://schemas.xmlsoap.org/soap/envelope/';
-    const string SCHEMA_SOAP_HTTP       = 'http://schemas.xmlsoap.org/soap/http';
-    const string SCHEMA_SOAP            = 'http://schemas.xmlsoap.org/wsdl/soap/';
-    const string SCHEMA_WSDL            = 'http://schemas.xmlsoap.org/wsdl/';
-    const string SCHEMA_WSDL_HTTP       = 'http://schemas.xmlsoap.org/wsdl/http/';
-    const string SCHEMA_DISCO           = 'http://schemas.xmlsoap.org/disco/';
-    const string SCHEMA_DISCO_SCL       = 'http://schemas.xmlsoap.org/disco/scl/';
-    const string SCHEMA_DISCO_SOAP      = 'http://schemas.xmlsoap.org/disco/soap/';
+    const SOAP_XML_SCHEMA_VERSION = 'http://www.w3.org/2001/XMLSchema';
+    const SOAP_XML_SCHEMA_INSTANCE = 'http://www.w3.org/2001/XMLSchema-instance';
+    const SOAP_SCHEMA_ENCODING = 'http://schemas.xmlsoap.org/soap/encoding/';
+    const SOAP_XML_SCHEMA_MIME = 'http://schemas.xmlsoap.org/wsdl/mime/';
+    const SOAP_ENVELOP = 'http://schemas.xmlsoap.org/soap/envelope/';
+    const SCHEMA_SOAP_HTTP = 'http://schemas.xmlsoap.org/soap/http';
+    const SCHEMA_SOAP = 'http://schemas.xmlsoap.org/wsdl/soap/';
+    const SCHEMA_WSDL = 'http://schemas.xmlsoap.org/wsdl/';
+    const SCHEMA_WSDL_HTTP = 'http://schemas.xmlsoap.org/wsdl/http/';
+    const SCHEMA_DISCO = 'http://schemas.xmlsoap.org/disco/';
+    const SCHEMA_DISCO_SCL = 'http://schemas.xmlsoap.org/disco/scl/';
+    const SCHEMA_DISCO_SOAP = 'http://schemas.xmlsoap.org/disco/soap/';
 
     /**
      * classes are parsed into struct
@@ -194,14 +195,6 @@ class SoapHandler
     private bool $warningNamespace;
 
     /**
-     * error description
-     *
-     * @var    bool
-     * @access private
-     */
-    private bool $errorDescription;
-
-    /**
      * constructor
      *
      * @param array  $soapItems   Array of SoapItem objects (required)
@@ -211,7 +204,7 @@ class SoapHandler
      * @param array  $options     Options
      *
      * @access public
-     * @return null
+     * @return void
      */
     public function __construct(
         array $soapItems,
@@ -231,16 +224,13 @@ class SoapHandler
 
         if (isset($namespace) && $namespace != '') {
             $this->warningNamespace = false;
-            $this->errorDescription = false;
             //$namespace .= (substr($namespace, -1) == '/') ? '' : '/';
         } else {
             $this->warningNamespace = true;
-            $this->errorDescription = true;
             $namespace = 'http://example.org/';
         }
         $this->namespace   = $namespace;
-        $this->description = ($description != '') ?
-            $description : 'my example service description';
+        $this->description = ($description != '') ? $description : 'my example service description';
         $this->soapServerOptions = array_merge(
             [
                 'uri' => $this->namespace,
@@ -250,9 +240,7 @@ class SoapHandler
         );
         $this->soapItems = $soapItems;
         $this->wsdlStruct = array();
-        $this->protocol = (
-            isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on'
-            ) ? 'https' : 'http';
+        $this->protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? 'https' : 'http';
     }
 
     // }}}
@@ -261,7 +249,7 @@ class SoapHandler
      * handle
      *
      * @access public
-     * @return null
+     * @return void
      */
     public function handle()
     {
@@ -291,7 +279,7 @@ class SoapHandler
      * create the soap-server
      *
      * @access private
-     * @return null
+     * @return void
      */
     private function createServer()
     {
@@ -362,7 +350,7 @@ class SoapHandler
      * handle wsdl
      *
      * @access private
-     * @return null
+     * @return void
      */
     private function handleWSDL()
     {
@@ -383,7 +371,7 @@ class SoapHandler
      * handle disco
      *
      * @access private
-     * @return null
+     * @return void
      */
     private function handleDISCO()
     {
@@ -417,7 +405,7 @@ class SoapHandler
      * handle info-site
      *
      * @access private
-     * @return null
+     * @return void
      */
     private function handleINFO()
     {
@@ -530,7 +518,7 @@ class SoapHandler
      * parse SoapItems into struct
      *
      * @access private
-     * @return null
+     * @return void
      */
     protected function intoStruct()
     {
@@ -544,7 +532,7 @@ class SoapHandler
      * dispatch types
      *
      * @access private
-     * @return null
+     * @return void
      */
     protected function classStructDispatch()
     {
@@ -578,11 +566,12 @@ class SoapHandler
     /**
      * parse complex type (class) properties into struct for WSDL generation
      *
-     * @var    string
+     * @param string $className string
+     * @return void
+     * @throws ReflectionException
      * @access private
-     * @return null
      */
-    protected function parseComplexTypeIntoStruct($className)
+    protected function parseComplexTypeIntoStruct(string $className)
     {
         if (!isset($this->wsdlStruct[$className])) {
             $class = new ReflectionClass($className);
@@ -671,7 +660,7 @@ class SoapHandler
      * parse SoapItem array into struct
      *
      * @access protected
-     * @return null
+     * @return void
      */
     protected function soapItemsIntoStruct()
     {
