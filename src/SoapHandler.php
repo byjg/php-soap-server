@@ -6,6 +6,7 @@ namespace ByJG\SoapServer;
 
 use ByJG\JinjaPhp\Exception\TemplateParseException;
 use ByJG\JinjaPhp\Loader\FileSystemLoader;
+use ByJG\Serializer\Serialize;
 use ByJG\Util\Uri;
 use ByJG\WebRequest\Exception\MessageException;
 use ByJG\WebRequest\Exception\RequestException;
@@ -361,11 +362,11 @@ class SoapHandler
     /**
      * create the soap-server
      *
-     * @access private
+     * @access protected
      * @return ResponseInterface
      * @throws MessageException
      */
-    private function createServer(): ResponseInterface
+    protected function createServer(): ResponseInterface
     {
         ob_start();
         $server = new SoapServer(null, $this->soapServerOptions);
@@ -429,22 +430,30 @@ class SoapHandler
         try {
             $result = call_user_func($soapItem->executor, $paramValues);
 
-            if (is_array($result)) {
-                $str = sizeof($result);
-                foreach ($result as $line) {
-                    $str .= "|$line";
+            if ($contentType === "text/plain") {
+                if (is_array($result)) {
+                    $str = sizeof($result);
+                    foreach ($result as $line) {
+                        $str .= "|$line";
+                    }
+                    return Response::getInstance(200)
+                        ->withHeader('Content-Type', $contentType)
+                        ->withBody(new MemoryStream($this->httpSuccess . "$str"));
+                } else {
+                    return Response::getInstance(200)
+                        ->withHeader('Content-Type', $contentType)
+                        ->withBody(new MemoryStream($this->httpSuccess . $result));
                 }
-                return Response::getInstance(200)
-                    ->withHeader('Content-Type', $contentType)
-                    ->withBody(new MemoryStream($this->httpSuccess . "$str"));
-            } elseif (is_object($result)) {
-                return Response::getInstance(400)
-                    ->withHeader('Content-Type', 'text/plain')
-                    ->withBody(new MemoryStream($this->httpFailure . "Return type is not supported"));
             } else {
+                if ($contentType === "application/json" && !is_string($result)) {
+                    $result = Serialize::from($result)->toJson();
+                } elseif ($contentType === "text/xml" && !is_string($result)) {
+                    $result = Serialize::from($result)->toXml();
+                }
+
                 return Response::getInstance(200)
                     ->withHeader('Content-Type', $contentType)
-                    ->withBody(new MemoryStream($this->httpSuccess . $result));
+                    ->withBody(new MemoryStream($result));
             }
         } catch (Exception $ex) {
             return Response::getInstance(500)

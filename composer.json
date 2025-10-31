@@ -14,7 +14,8 @@
     "ext-soap": "*",
     "ext-dom": "*",
     "byjg/jinja-php": "^6.0",
-    "byjg/webrequest": "^6.0"
+    "byjg/webrequest": "^6.0",
+    "byjg/serializer": "^6.0"
   },
   "require-dev": {
     "phpunit/phpunit": "^10.5|^11.5",
