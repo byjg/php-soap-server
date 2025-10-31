@@ -34,6 +34,7 @@ composer require byjg/soap-server
 
 use ByJG\SoapServer\Attributes\{SoapService, SoapOperation, SoapParameter};
 use ByJG\SoapServer\SoapAttributeParser;
+use ByJG\SoapServer\ResponseWriter;
 
 #[SoapService(
     serviceName: 'CalculatorService',
@@ -60,7 +61,8 @@ class Calculator
 // Start the service
 $parser = new SoapAttributeParser();
 $handler = $parser->parse(Calculator::class);
-$handler->handle();
+$response = $handler->handle();
+ResponseWriter::output($response);
 ```
 
 ### Using Programmatic Configuration
@@ -69,6 +71,7 @@ $handler->handle();
 <?php
 
 use ByJG\SoapServer\{SoapHandler, SoapOperationConfig, SoapParameterConfig, SoapType};
+use ByJG\SoapServer\ResponseWriter;
 
 $addOperation = new SoapOperationConfig();
 $addOperation->description = 'Adds two numbers';
@@ -85,7 +88,8 @@ $handler = new SoapHandler(
     soapItems: ['add' => $addOperation],
     serviceName: 'CalculatorService'
 );
-$handler->handle();
+$response = $handler->handle();
+ResponseWriter::output($response);
 ```
 
 ## Running the Service

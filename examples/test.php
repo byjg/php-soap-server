@@ -1,5 +1,6 @@
 <?php
 
+use ByJG\SoapServer\ResponseWriter;
 use ByJG\SoapServer\SoapHandler;
 use ByJG\SoapServer\SoapOperationConfig;
 use ByJG\SoapServer\SoapParameterConfig;
@@ -45,4 +46,5 @@ $processor = new SoapHandler([
     'processUser' => $processUserItem
 ], 'MyService');
 
-$processor->handle();
+$response = $processor->handle();
+ResponseWriter::output($response);

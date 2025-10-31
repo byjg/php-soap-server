@@ -158,7 +158,10 @@ $handler = new SoapHandler(
 );
 
 // Handle the request
-$handler->handle();
+use ByJG\SoapServer\ResponseWriter;
+
+$response = $handler->handle();
+ResponseWriter::output($response);
 ```
 
 ## Using Complex Types
@@ -193,7 +196,9 @@ $handler = new SoapHandler(
     soapItems: ['createUser' => $createUserOperation],
     serviceName: 'UserService'
 );
-$handler->handle();
+
+$response = $handler->handle();
+ResponseWriter::output($response);
 ```
 
 ## Arrays and Collections

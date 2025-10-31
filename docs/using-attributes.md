@@ -233,9 +233,12 @@ class User
 }
 
 // Start the service
+use ByJG\SoapServer\ResponseWriter;
+
 $parser = new SoapAttributeParser();
 $handler = $parser->parse(UserService::class);
-$handler->handle();
+$response = $handler->handle();
+ResponseWriter::output($response);
 ```
 
 ## Best Practices

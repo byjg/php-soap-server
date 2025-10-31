@@ -4,12 +4,14 @@ namespace ByJG\SoapServer;
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 
+use ByJG\JinjaPhp\Exception\TemplateParseException;
 use ByJG\JinjaPhp\Loader\FileSystemLoader;
 use ByJG\WebRequest\Exception\MessageException;
 use ByJG\WebRequest\Psr7\MemoryStream;
 use ByJG\WebRequest\Psr7\Response;
 use DOMDocument;
 use DOMElement;
+use DOMException;
 use Exception;
 use Psr\Http\Message\ResponseInterface;
 use ReflectionClass;
@@ -290,7 +292,7 @@ class SoapHandler
         $server->handle();
         $output = ob_get_clean();
 
-        return (new Response(200))
+        return Response::getInstance(200)
             ->withHeader('Content-Type', 'text/xml')
             ->withBody(new MemoryStream($output));
     }
@@ -310,7 +312,7 @@ class SoapHandler
         $soapItem = $this->getSoapItem($methodName);
 
         if (!$soapItem) {
-            return (new Response(400))
+            return Response::getInstance(400)
                 ->withHeader('Content-Type', 'text/plain')
                 ->withBody(new MemoryStream($this->httpFailure . "Method does not exists"));
         }
@@ -333,7 +335,7 @@ class SoapHandler
         }
 
         if ($missingParams != "") {
-            return (new Response(400))
+            return Response::getInstance(400)
                 ->withHeader('Content-Type', 'text/plain')
                 ->withBody(new MemoryStream($this->httpFailure . "Missing params $missingParams"));
         }
@@ -346,20 +348,20 @@ class SoapHandler
                 foreach ($result as $line) {
                     $str .= "|$line";
                 }
-                return (new Response(200))
+                return Response::getInstance(200)
                     ->withHeader('Content-Type', $contentType)
                     ->withBody(new MemoryStream($this->httpSuccess . "$str"));
             } elseif (is_object($result)) {
-                return (new Response(400))
+                return Response::getInstance(400)
                     ->withHeader('Content-Type', 'text/plain')
                     ->withBody(new MemoryStream($this->httpFailure . "Return type is not supported"));
             } else {
-                return (new Response(200))
+                return Response::getInstance(200)
                     ->withHeader('Content-Type', $contentType)
                     ->withBody(new MemoryStream($this->httpSuccess . $result));
             }
         } catch (Exception $ex) {
-            return (new Response(500))
+            return Response::getInstance(500)
                 ->withHeader('Content-Type', 'text/plain')
                 ->withBody(new MemoryStream($this->httpFailure . $ex->getMessage()));
         }
@@ -387,7 +389,7 @@ class SoapHandler
         $this->createWSDLBinding();
         $this->createWSDLService();
 
-        return (new Response(200))
+        return Response::getInstance(200)
             ->withHeader('Content-Type', 'text/xml')
             ->withBody(new MemoryStream($this->wsdl->saveXML()));
     }
@@ -399,6 +401,8 @@ class SoapHandler
      *
      * @access private
      * @return ResponseInterface
+     * @throws MessageException
+     * @throws DOMException
      */
     private function handleDISCO(): ResponseInterface
     {
@@ -423,7 +427,7 @@ class SoapHandler
         $discoDiscovery->appendChild($discoContractRef);
         $disco->appendChild($discoDiscovery);
 
-        return (new Response(200))
+        return Response::getInstance(200)
             ->withHeader('Content-Type', 'text/xml')
             ->withBody(new MemoryStream($disco->saveXML()));
     }
@@ -435,6 +439,8 @@ class SoapHandler
      *
      * @access private
      * @return ResponseInterface
+     * @throws MessageException
+     * @throws TemplateParseException
      */
     private function handleINFO(): ResponseInterface
     {
@@ -499,7 +505,7 @@ class SoapHandler
             'warningNamespace' => $this->warningNamespace === true || $this->namespace === 'http://example.org/'
         ]);
 
-        return (new Response(200))
+        return Response::getInstance(200)
             ->withHeader('Content-Type', 'text/html')
             ->withBody(new MemoryStream($html));
     }
@@ -550,6 +556,7 @@ class SoapHandler
      *
      * @access private
      * @return void
+     * @throws ReflectionException
      */
     protected function intoStruct()
     {

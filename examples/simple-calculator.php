@@ -7,6 +7,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 use ByJG\SoapServer\Attributes\SoapOperation;
 use ByJG\SoapServer\Attributes\SoapParameter;
 use ByJG\SoapServer\Attributes\SoapService;
+use ByJG\SoapServer\ResponseWriter;
 use ByJG\SoapServer\SoapAttributeParser;
 
 /**
@@ -59,4 +60,5 @@ class Calculator
 // Parse the service
 $parser = new SoapAttributeParser();
 $handler = $parser->parse(Calculator::class);
-$handler->handle();
+$response = $handler->handle();
+ResponseWriter::output($response);
