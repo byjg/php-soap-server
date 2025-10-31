@@ -11,6 +11,8 @@
   "minimum-stability": "dev",
   "require": {
     "php": ">=8.1 <8.5",
+    "ext-soap": "*",
+    "ext-dom": "*",
     "byjg/jinja-php": "^6.0"
   },
   "require-dev": {

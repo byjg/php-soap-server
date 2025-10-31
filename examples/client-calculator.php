@@ -30,7 +30,7 @@ try {
 
     // Call the add operation
     echo "Calling add(10, 5)...\n";
-    $result = $client->add("Joao", 5);
+    $result = $client->add(10, 5);
     echo "Result: $result\n\n";
 
     // Call the subtract operation
@@ -48,15 +48,15 @@ try {
     $result = $client->divide(15.0, 3.0);
     echo "Result: $result\n\n";
 
-    // Call the greet operation (with default parameter)
-    echo "Calling greet()...\n";
-    $result = $client->greet();
-    echo "Result: $result\n\n";
-
-    // Call the greet operation (with custom name)
-    echo "Calling greet('Alice')...\n";
-    $result = $client->greet('Alice');
-    echo "Result: $result\n\n";
+//    // Call the greet operation (with default parameter)
+//    echo "Calling greet()...\n";
+//    $result = $client->greet();
+//    echo "Result: $result\n\n";
+//
+//    // Call the greet operation (with custom name)
+//    echo "Calling greet('Alice')...\n";
+//    $result = $client->greet('Alice');
+//    echo "Result: $result\n\n";
 
     echo str_repeat("=", 60) . "\n";
     echo "✓ All operations completed successfully!\n";

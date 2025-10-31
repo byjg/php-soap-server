@@ -2,9 +2,9 @@
 
 use ByJG\SoapServer\SoapHandler;
 use ByJG\SoapServer\SoapOperationConfig;
-use ByJG\SoapServer\SoapParameter;
-use ByJG\SoapServer\SoapType;
+use ByJG\SoapServer\SoapParameterConfig;
 use ByJG\SoapServer\SoapTest;
+use ByJG\SoapServer\SoapType;
 
 require_once "vendor/autoload.php";
 
@@ -12,9 +12,9 @@ require_once "vendor/autoload.php";
 $greetItem = new SoapOperationConfig();
 $greetItem->description = 'Greets a user';
 $greetItem->args = [
-    new SoapParameter('name', SoapType::String),
-    new SoapParameter('age', SoapType::Integer, 0),
-    new SoapParameter('title', SoapType::String, 0)
+    new SoapParameterConfig('name', SoapType::String),
+    new SoapParameterConfig('age', SoapType::Integer, 0),
+    new SoapParameterConfig('title', SoapType::String, 0)
 ];
 $greetItem->returnType = SoapType::String;
 $greetItem->executor = function(array $params) {
@@ -27,8 +27,8 @@ $greetItem->executor = function(array $params) {
 $processUserItem = new SoapOperationConfig();
 $processUserItem->description = 'Processes user information';
 $processUserItem->args = [
-    new SoapParameter('user', SoapTest::class),
-    new SoapParameter('action', SoapType::String, 0)
+    new SoapParameterConfig('user', SoapTest::class),
+    new SoapParameterConfig('action', SoapType::String, 0)
 ];
 $processUserItem->returnType = SoapType::String;
 $processUserItem->executor = function(array $params) {

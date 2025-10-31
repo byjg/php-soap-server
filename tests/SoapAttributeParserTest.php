@@ -10,8 +10,12 @@ use ByJG\SoapServer\Attributes\SoapService;
 use ByJG\SoapServer\Exception\InvalidServiceException;
 use ByJG\SoapServer\SoapAttributeParser;
 use ByJG\SoapServer\SoapHandler;
+use ByJG\SoapServer\SoapOperationConfig;
+use ByJG\SoapServer\SoapParameterConfig;
 use ByJG\SoapServer\SoapType;
+use Override;
 use PHPUnit\Framework\TestCase;
+use ReflectionObject;
 
 /**
  * Example SOAP service for testing
@@ -82,7 +86,7 @@ class SoapAttributeParserTest extends TestCase
 {
     private SoapAttributeParser $parser;
 
-    #[\Override]
+    #[Override]
     protected function setUp(): void
     {
         $this->parser = new SoapAttributeParser();
@@ -111,10 +115,10 @@ class SoapAttributeParserTest extends TestCase
         $handler = $this->parser->parse(CalculatorService::class);
 
         // Access the soapItems through reflection since it's private
-        $reflection = new \ReflectionObject($handler);
+        $reflection = new ReflectionObject($handler);
         $property = $reflection->getProperty('soapItems');
-        $property->setAccessible(true);
-        /** @var array<string, \ByJG\SoapServer\SoapOperationConfig> $soapItems */
+        //$property->setAccessible(true);
+        /** @var array<string, SoapOperationConfig> $soapItems */
         $soapItems = $property->getValue($handler);
 
         // Should have 5 operations (excluding internalMethod)
@@ -134,10 +138,10 @@ class SoapAttributeParserTest extends TestCase
         $handler = $this->parser->parse(CalculatorService::class);
 
         // Access soapItems
-        $reflection = new \ReflectionObject($handler);
+        $reflection = new ReflectionObject($handler);
         $property = $reflection->getProperty('soapItems');
-        $property->setAccessible(true);
-        /** @var array<string, \ByJG\SoapServer\SoapOperationConfig> $soapItems */
+        //$property->setAccessible(true);
+        /** @var array<string, SoapOperationConfig> $soapItems */
         $soapItems = $property->getValue($handler);
 
         // Check 'add' operation
@@ -151,10 +155,10 @@ class SoapAttributeParserTest extends TestCase
         $handler = $this->parser->parse(CalculatorService::class);
 
         // Access soapItems
-        $reflection = new \ReflectionObject($handler);
+        $reflection = new ReflectionObject($handler);
         $property = $reflection->getProperty('soapItems');
-        $property->setAccessible(true);
-        /** @var array<string, \ByJG\SoapServer\SoapOperationConfig> $soapItems */
+        //$property->setAccessible(true);
+        /** @var array<string, SoapOperationConfig> $soapItems */
         $soapItems = $property->getValue($handler);
 
         // Check 'add' operation parameters
@@ -163,14 +167,14 @@ class SoapAttributeParserTest extends TestCase
         $this->assertIsArray($addOperation->args);
 
         // Check first parameter
-        /** @var \ByJG\SoapServer\SoapParameter $paramA */
+        /** @var SoapParameterConfig $paramA */
         $paramA = $addOperation->args[0];
         $this->assertEquals('a', $paramA->name);
         $this->assertEquals(SoapType::Integer, $paramA->type);
         $this->assertEquals(1, $paramA->minOccurs); // Required
 
         // Check second parameter
-        /** @var \ByJG\SoapServer\SoapParameter $paramB */
+        /** @var SoapParameterConfig $paramB */
         $paramB = $addOperation->args[1];
         $this->assertEquals('b', $paramB->name);
         $this->assertEquals(SoapType::Integer, $paramB->type);
@@ -182,17 +186,17 @@ class SoapAttributeParserTest extends TestCase
         $handler = $this->parser->parse(CalculatorService::class);
 
         // Access soapItems
-        $reflection = new \ReflectionObject($handler);
+        $reflection = new ReflectionObject($handler);
         $property = $reflection->getProperty('soapItems');
-        $property->setAccessible(true);
-        /** @var array<string, \ByJG\SoapServer\SoapOperationConfig> $soapItems */
+        //$property->setAccessible(true);
+        /** @var array<string, SoapOperationConfig> $soapItems */
         $soapItems = $property->getValue($handler);
 
         // Check 'greet' operation
         $greetOperation = $soapItems['greet'];
         $this->assertCount(1, $greetOperation->args);
 
-        /** @var \ByJG\SoapServer\SoapParameter $param */
+        /** @var SoapParameterConfig $param */
         $param = $greetOperation->args[0];
         $this->assertEquals('name', $param->name);
         $this->assertEquals(SoapType::String, $param->type);
@@ -204,17 +208,17 @@ class SoapAttributeParserTest extends TestCase
         $handler = $this->parser->parse(CalculatorService::class);
 
         // Access soapItems
-        $reflection = new \ReflectionObject($handler);
+        $reflection = new ReflectionObject($handler);
         $property = $reflection->getProperty('soapItems');
-        $property->setAccessible(true);
-        /** @var array<string, \ByJG\SoapServer\SoapOperationConfig> $soapItems */
+        //$property->setAccessible(true);
+        /** @var array<string, SoapOperationConfig> $soapItems */
         $soapItems = $property->getValue($handler);
 
         // Check 'multiply' operation
         $multiplyOperation = $soapItems['multiply'];
         $this->assertCount(2, $multiplyOperation->args);
 
-        /** @var \ByJG\SoapServer\SoapParameter $paramA */
+        /** @var SoapParameterConfig $paramA */
         $paramA = $multiplyOperation->args[0];
         $this->assertEquals('a', $paramA->name);
         $this->assertEquals(SoapType::Float, $paramA->type);
@@ -227,10 +231,10 @@ class SoapAttributeParserTest extends TestCase
         $handler = $this->parser->parse(CalculatorService::class);
 
         // Access soapItems
-        $reflection = new \ReflectionObject($handler);
+        $reflection = new ReflectionObject($handler);
         $property = $reflection->getProperty('soapItems');
-        $property->setAccessible(true);
-        /** @var array<string, \ByJG\SoapServer\SoapOperationConfig> $soapItems */
+        //$property->setAccessible(true);
+        /** @var array<string, SoapOperationConfig> $soapItems */
         $soapItems = $property->getValue($handler);
 
         // Check 'divide' operation
@@ -251,10 +255,10 @@ class SoapAttributeParserTest extends TestCase
         $handler = $this->parser->parse(CalculatorService::class);
 
         // Access soapItems
-        $reflection = new \ReflectionObject($handler);
+        $reflection = new ReflectionObject($handler);
         $property = $reflection->getProperty('soapItems');
-        $property->setAccessible(true);
-        /** @var array<string, \ByJG\SoapServer\SoapOperationConfig> $soapItems */
+        //$property->setAccessible(true);
+        /** @var array<string, SoapOperationConfig> $soapItems */
         $soapItems = $property->getValue($handler);
 
         // Test 'add' operation executor

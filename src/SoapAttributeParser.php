@@ -12,6 +12,7 @@ use ReflectionClass;
 use ReflectionMethod;
 use ReflectionNamedType;
 use ReflectionParameter;
+use ReflectionType;
 use ReflectionUnionType;
 
 /**
@@ -140,7 +141,7 @@ class SoapAttributeParser
      * Parse parameters from a method
      *
      * @param ReflectionMethod $method
-     * @return array<SoapParameter>
+     * @return array<SoapParameterConfig>
      */
     private function parseParameters(ReflectionMethod $method): array
     {
@@ -238,10 +239,10 @@ class SoapAttributeParser
     /**
      * Extract type from ReflectionType
      *
-     * @param \ReflectionType $type
+     * @param ReflectionType $type
      * @return SoapType|string
      */
-    private function extractType(\ReflectionType $type): SoapType|string
+    private function extractType(ReflectionType $type): SoapType|string
     {
         if ($type instanceof ReflectionNamedType) {
             $typeName = $type->getName();

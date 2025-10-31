@@ -113,7 +113,7 @@ class SoapHandler
         $i = 0;
         foreach ($soapItem->args as $soapArg) {
             $value = $arguments[$i] ?? null;
-            // Cast value to the correct type based on SoapParameter definition
+            // Cast value to the correct type based on SoapParameterConfig definition
             if ($value !== null) {
                 $value = $this->castParameterValue($value, $soapArg);
             }
@@ -1101,14 +1101,14 @@ class SoapHandler
     }
 
     /**
-     * Cast a parameter value to the correct type based on SoapParameter definition
+     * Cast a parameter value to the correct type based on SoapParameterConfig definition
      *
      * @param mixed $value The value to cast
-     * @param SoapParameter $param The parameter definition
+     * @param SoapParameterConfig $param The parameter definition
      * @return mixed The cast value
      * @throws Exception if the value cannot be cast to the target type
      */
-    private function castParameterValue(mixed $value, SoapParameter $param): mixed
+    private function castParameterValue(mixed $value, SoapParameterConfig $param): mixed
     {
         // Cast based on SoapType enum
         if ($param->type instanceof SoapType) {
