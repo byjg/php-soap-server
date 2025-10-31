@@ -251,7 +251,7 @@ class SoapHandler
      * @access public
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         $this->intoStruct();
         switch (strtolower($_SERVER['QUERY_STRING'] ?? '')){
@@ -295,7 +295,7 @@ class SoapHandler
      *
      * @access private
      */
-    private function handleHTTP()
+    private function handleHTTP(): void
     {
         $methodName = $_REQUEST["httpmethod"];
         $soapItem = $this->getSoapItem($methodName);
@@ -373,7 +373,7 @@ class SoapHandler
      * @access private
      * @return void
      */
-    private function handleDISCO()
+    private function handleDISCO(): void
     {
         header('Content-Type: text/xml');
         $disco = new DOMDocument('1.0', 'utf-8');
@@ -407,7 +407,7 @@ class SoapHandler
      * @access private
      * @return void
      */
-    private function handleINFO()
+    private function handleINFO(): void
     {
         header('Content-Type: text/html');
 
@@ -533,8 +533,9 @@ class SoapHandler
      *
      * @access private
      * @return void
+     * @throws ReflectionException
      */
-    protected function classStructDispatch()
+    protected function classStructDispatch(): void
     {
         foreach ($this->wsdlStruct[$this->classname]['method'] as $method) {
             foreach ($method['var'] as $var) {
@@ -571,7 +572,7 @@ class SoapHandler
      * @throws ReflectionException
      * @access private
      */
-    protected function parseComplexTypeIntoStruct(string $className)
+    protected function parseComplexTypeIntoStruct(string $className): void
     {
         if (!isset($this->wsdlStruct[$className])) {
             $class = new ReflectionClass($className);
@@ -662,7 +663,7 @@ class SoapHandler
      * @access protected
      * @return void
      */
-    protected function soapItemsIntoStruct()
+    protected function soapItemsIntoStruct(): void
     {
         foreach ($this->soapItems as $methodName => $soapItem) {
             $this->wsdlStruct[$this->classname]['method'][$methodName]['description'] = $soapItem->description;
@@ -715,7 +716,7 @@ class SoapHandler
      *
      * @return void
      */
-    protected function createWSDLDefinitions()
+    protected function createWSDLDefinitions(): void
     {
         /*
         <definitions name="myService"

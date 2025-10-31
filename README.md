@@ -125,6 +125,14 @@ Comprehensive documentation is available:
 - [Complex Types](docs/complex-types.md) - Working with custom classes and objects
 - [Templates](docs/templates.md) - Customizing the service documentation UI
 
+## License and Acknowledgments
+
+This project is licensed under the [MIT License](LICENSE).
+
+**Note**: Parts of this codebase were derived from an older PHP class originally licensed under the PHP License. The
+original code has been modernized and adapted for this project. For detailed information about the licensing and
+acknowledgments, see [License Acknowledgments](docs/license-acknowledgments.md).
+
 ## Dependencies
 
 ```mermaid
