@@ -6,14 +6,18 @@ namespace ByJG\SoapServer;
 
 use ByJG\JinjaPhp\Exception\TemplateParseException;
 use ByJG\JinjaPhp\Loader\FileSystemLoader;
+use ByJG\Util\Uri;
 use ByJG\WebRequest\Exception\MessageException;
+use ByJG\WebRequest\Exception\RequestException;
 use ByJG\WebRequest\Psr7\MemoryStream;
 use ByJG\WebRequest\Psr7\Response;
+use ByJG\WebRequest\Psr7\ServerRequest;
 use DOMDocument;
 use DOMElement;
 use DOMException;
 use Exception;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionObject;
@@ -97,6 +101,14 @@ class SoapHandler
      * @access private
      */
     private array $soapItems = array();
+
+    /**
+     * PSR-7 Server Request object
+     *
+     * @var ServerRequestInterface
+     * @access private
+     */
+    private ServerRequestInterface $request;
 
     /**
      * Magic method to handle SOAP calls when using SoapItems
@@ -203,21 +215,24 @@ class SoapHandler
     /**
      * constructor
      *
-     * @param array  $soapItems   Array of SoapItem objects (required)
+     * @param array $soapItems Array of SoapItem objects (required)
      * @param string $serviceName Service name for WSDL (defaults to class name if empty)
-     * @param string $namespace   Namespace
+     * @param string $namespace Namespace
      * @param string $description The description
-     * @param array  $options     Options
+     * @param array $options Options
+     * @param ServerRequestInterface|null $request PSR-7 ServerRequest (auto-created from globals if null)
      *
+     * @throws MessageException
+     * @throws RequestException
      * @access public
-     * @return void
      */
     public function __construct(
         array $soapItems,
         string $serviceName = "",
         string $namespace = "",
         string $description = "",
-        array $options = []
+        array                   $options = [],
+        ?ServerRequestInterface $request = null
     )
     {
         // Set service name (used for WSDL generation)
@@ -246,7 +261,65 @@ class SoapHandler
         );
         $this->soapItems = $soapItems;
         $this->wsdlStruct = array();
-        $this->protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? 'https' : 'http';
+
+        // Initialize request from parameter or create from globals
+        $this->request = $request ?? $this->createRequestFromGlobals();
+
+        // Determine protocol from request
+        $serverParams = $this->request->getServerParams();
+        $this->protocol = (isset($serverParams['HTTPS']) && $serverParams['HTTPS'] == 'on') ? 'https' : 'http';
+    }
+
+    /**
+     * Create a PSR-7 ServerRequest from PHP global variables
+     *
+     * @return ServerRequestInterface
+     * @throws MessageException
+     * @throws RequestException
+     */
+    private function createRequestFromGlobals(): ServerRequestInterface
+    {
+        // Get the request URI
+        $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
+        $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+        $scheme = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? 'https' : 'http';
+        $uri = new Uri($scheme . '://' . $host . $requestUri);
+
+        // Create ServerRequest with global variables
+        $request = new ServerRequest($uri, $_SERVER, $_COOKIE);
+
+        // Set the HTTP method
+        $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+        $request = $request->withMethod($method);
+
+        // Add headers from SERVER
+        foreach ($_SERVER as $key => $value) {
+            if (str_starts_with($key, 'HTTP_')) {
+                $headerName = str_replace('_', '-', substr($key, 5));
+                $request = $request->withHeader($headerName, $value);
+            } elseif (in_array($key, ['CONTENT_TYPE', 'CONTENT_LENGTH'])) {
+                $headerName = str_replace('_', '-', $key);
+                $request = $request->withHeader($headerName, $value);
+            }
+        }
+
+        // Set the request body from php://input
+        $body = file_get_contents('php://input');
+        if ($body) {
+            $request = $request->withBody(new MemoryStream($body));
+        }
+
+        // Parse body for POST/PUT requests
+        if (in_array($method, ['POST', 'PUT', 'PATCH'])) {
+            $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+            if (stripos($contentType, 'application/x-www-form-urlencoded') !== false) {
+                $request = $request->withParsedBody($_POST);
+            } elseif (stripos($contentType, 'multipart/form-data') !== false) {
+                $request = $request->withParsedBody($_POST);
+            }
+        }
+
+        return $request;
     }
 
     // }}}
@@ -256,24 +329,31 @@ class SoapHandler
      *
      * @access public
      * @return ResponseInterface
+     * @throws DOMException
+     * @throws MessageException
+     * @throws ReflectionException
+     * @throws TemplateParseException
      */
     public function handle(): ResponseInterface
     {
+        if ($this->request->hasHeader('soapaction')) {
+            return $this->createServer();
+        }
+
         $this->intoStruct();
-        switch (strtolower($_SERVER['QUERY_STRING'] ?? '')){
-        case 'wsdl':
-            return $this->handleWSDL();
-        case 'disco':
-            return $this->handleDISCO();
-        default:
-            if (isset($_SERVER['HTTP_SOAPACTION'])) {
-                return $this->createServer();
-            } elseif (isset($_REQUEST['httpmethod'])) {
-                return $this->handleHTTP(); // by JG
-            } else {
-                return $this->handleINFO();
+        $queryParams = $this->request->getQueryParams();
+        foreach ($queryParams as $key => $value) {
+            $item = strtolower($key);
+            if ($item === 'wsdl') {
+                return $this->handleWSDL();
+            } elseif ($item === 'disco') {
+                return $this->handleDISCO();
+            } elseif ($item == "httpmethod") {
+                return $this->handleHTTP();
             }
         }
+
+        return $this->handleINFO();
     }
 
     // }}}
@@ -283,6 +363,7 @@ class SoapHandler
      *
      * @access private
      * @return ResponseInterface
+     * @throws MessageException
      */
     private function createServer(): ResponseInterface
     {
@@ -308,7 +389,12 @@ class SoapHandler
      */
     private function handleHTTP(): ResponseInterface
     {
-        $methodName = $_REQUEST["httpmethod"];
+        // Get request parameters (query params + parsed body)
+        $queryParams = $this->request->getQueryParams();
+        $parsedBody = $this->request->getParsedBody();
+        $requestParams = array_merge($queryParams, is_array($parsedBody) ? $parsedBody : []);
+
+        $methodName = $requestParams["httpmethod"] ?? null;
         $soapItem = $this->getSoapItem($methodName);
 
         if (!$soapItem) {
@@ -324,7 +410,7 @@ class SoapHandler
         $paramValues = array();
         $missingParams = "";
         foreach ($soapItem->args as $soapArg) {
-            $paramValue = $_REQUEST[$soapArg->name] ?? null;
+            $paramValue = $requestParams[$soapArg->name] ?? null;
             // Only report missing if minOccurs > 0 (required)
             if (is_null($paramValue) && $soapArg->minOccurs > 0) {
                 $missingParams .= (($missingParams == "") ? "" : ", ") . $soapArg->name;
@@ -412,8 +498,9 @@ class SoapHandler
         $discoDiscovery->setAttribute('xmlns:xsd', self::SOAP_XML_SCHEMA_VERSION);
         $discoDiscovery->setAttribute('xmlns', self::SCHEMA_DISCO);
         $discoContractRef = $disco->createElement('contractRef');
+        $serverParams = $this->request->getServerParams();
         $urlBase = $this->protocol . '://'
-            . $_SERVER['HTTP_HOST']
+            . ($serverParams['HTTP_HOST'] ?? 'localhost')
             . $this->getSelfUrl();
         $discoContractRef->setAttribute('ref', $urlBase . '?wsdl');
         $discoContractRef->setAttribute('docRef', $urlBase);
@@ -536,7 +623,8 @@ class SoapHandler
 
     private function getSelfUrl()
     {
-	$url = $_SERVER['REQUEST_URI'] ?? '';
+        $serverParams = $this->request->getServerParams();
+        $url = $serverParams['REQUEST_URI'] ?? '';
 
 	$ipos = strpos($url, '?');
 	if ($ipos !== false)
@@ -1119,9 +1207,10 @@ class SoapHandler
         $port->setAttribute('name', $this->classname . 'Port');
         $port->setAttribute('binding', 'typens:' . $this->classname . 'Binding');
         $adress = $this->wsdl->createElement('soap:address');
+        $serverParams = $this->request->getServerParams();
         $adress->setAttribute(
             'location',
-            $this->protocol . '://' . $_SERVER['HTTP_HOST'] . $this->getSelfUrl()
+            $this->protocol . '://' . ($serverParams['HTTP_HOST'] ?? 'localhost') . $this->getSelfUrl()
         );
         $port->appendChild($adress);
         $service->appendChild($port);
