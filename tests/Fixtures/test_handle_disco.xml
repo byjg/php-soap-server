@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="utf-8"?>
+<discovery xmlns="http://schemas.xmlsoap.org/disco/"><contractRef xmlns="http://schemas.xmlsoap.org/disco/scl/" ref="http://localhost?wsdl" docRef="http://localhost"><soap address="http://localhost" xmlns:q1="http://example.com/test" binding="q1:TestService"/></contractRef></discovery>

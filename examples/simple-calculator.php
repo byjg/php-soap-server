@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/CalculatorObject.php';
 
 use ByJG\SoapServer\Attributes\SoapOperation;
 use ByJG\SoapServer\Attributes\SoapParameter;
@@ -54,6 +55,16 @@ class Calculator
             return null;
         }
         return $numerator / $denominator;
+    }
+
+    #[SoapOperation(description: 'Returns a complex object')]
+    public function complex(int $a, int $b): CalculatorObject
+    {
+        $calculator = new CalculatorObject();
+        $calculator->a = $a;
+        $calculator->b = $b;
+        $calculator->result = $a + $b;
+        return $calculator;
     }
 }
 

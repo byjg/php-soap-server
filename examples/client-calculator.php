@@ -48,6 +48,12 @@ try {
     $result = $client->divide(15.0, 3.0);
     echo "Result: $result\n\n";
 
+    // Call the divide operation
+    echo "Calling complex...\n";
+    $result = $client->complex(20, 30);
+    echo "var_dump: \n";
+    var_dump($result);
+
 //    // Call the greet operation (with default parameter)
 //    echo "Calling greet()...\n";
 //    $result = $client->greet();

@@ -178,11 +178,8 @@ class SoapHandlerTest extends TestCase
 
         // Validate WSDL content
         $body = $response->getBody()->getContents();
-        $this->assertStringContainsString('<?xml', $body);
-        $this->assertStringContainsString('<definitions', $body);
-        $this->assertStringContainsString('TestService', $body);
-        $this->assertStringContainsString('add', $body);
-        $this->assertStringContainsString('greet', $body);
+        $expected = file_get_contents(__DIR__ . "/Fixtures/test_handle_wsdl.xml");
+        $this->assertEquals($expected, $body);
     }
 
     /**
@@ -210,9 +207,8 @@ class SoapHandlerTest extends TestCase
 
         // Validate DISCO content
         $body = $response->getBody()->getContents();
-        $this->assertStringContainsString('<?xml', $body);
-        $this->assertStringContainsString('<discovery', $body);
-        $this->assertStringContainsString('contractRef', $body);
+        $expected = file_get_contents(__DIR__ . "/Fixtures/test_handle_disco.xml");
+        $this->assertEquals($expected, $body);
     }
 
     /**
@@ -271,8 +267,7 @@ class SoapHandlerTest extends TestCase
 
         // Validate response body
         $body = $response->getBody()->getContents();
-        $this->assertStringContainsString('OK|', $body);
-        $this->assertStringContainsString('15', $body);
+        $this->assertEquals('OK|15', $body);
     }
 
     /**
@@ -298,8 +293,7 @@ class SoapHandlerTest extends TestCase
 
         // Validate response body contains default greeting
         $body = $response->getBody()->getContents();
-        $this->assertStringContainsString('OK|', $body);
-        $this->assertStringContainsString('Hello, World!', $body);
+        $this->assertEquals('OK|Hello, World!', $body);
     }
 
     /**
@@ -326,9 +320,7 @@ class SoapHandlerTest extends TestCase
 
         // Validate error message
         $body = $response->getBody()->getContents();
-        $this->assertStringContainsString('ERR|', $body);
-        $this->assertStringContainsString('Missing params', $body);
-        $this->assertStringContainsString('b', $body);
+        $this->assertEquals('ERR|Missing params b', $body);
     }
 
     /**
@@ -354,8 +346,7 @@ class SoapHandlerTest extends TestCase
 
         // Validate error message
         $body = $response->getBody()->getContents();
-        $this->assertStringContainsString('ERR|', $body);
-        $this->assertStringContainsString('Method does not exists', $body);
+        $this->assertEquals('ERR|Method does not exists', $body);
     }
 
     /**
@@ -446,11 +437,9 @@ class SoapHandlerTest extends TestCase
 
         // Validate XML response
         $body = $response->getBody()->getContents();
-        $this->assertStringContainsString('<?xml', $body);
-        $this->assertStringContainsString('Bob', $body);
-        $this->assertStringContainsString('bob@example.com', $body);
-        $this->assertStringContainsString('<name>Bob</name>', $body);
-        $this->assertStringContainsString('<age>25</age>', $body);
+        $body = $response->getBody()->getContents();
+        $expected = file_get_contents(__DIR__ . "/Fixtures/test_handle_http_with_xml_model_response.xml");
+        $this->assertEquals($expected, $body);
     }
 
     /**
@@ -499,13 +488,9 @@ class SoapHandlerTest extends TestCase
 
         // The response should be XML
         $body = $response->getBody()->getContents();
-        $this->assertStringContainsString('<?xml', $body);
-
-        // Should be a SOAP envelope
+        $this->assertStringStartsWith('<?xml', $body);
         $this->assertStringContainsString('SOAP-ENV:Envelope', $body);
         $this->assertStringContainsString('SOAP-ENV:Body', $body);
-
-        // Should contain the response (15 = 10 + 5)
         $this->assertStringContainsString('addResponse', $body);
         $this->assertStringContainsString('15', $body);
     }
@@ -631,8 +616,7 @@ class SoapHandlerTest extends TestCase
 
         // Validate response contains sum
         $body = $response->getBody()->getContents();
-        $this->assertStringContainsString('OK|', $body);
-        $this->assertStringContainsString('50', $body);
+        $this->assertEquals('OK|50', $body);
     }
 
     /**
@@ -658,7 +642,7 @@ class SoapHandlerTest extends TestCase
 
         // Validate correct integer addition
         $body = $response->getBody()->getContents();
-        $this->assertStringContainsString('15', $body);
+        $this->assertEquals('OK|15', $body);
     }
 
     /**
@@ -694,7 +678,6 @@ class SoapHandlerTest extends TestCase
 
         // Validate error message
         $body = $response->getBody()->getContents();
-        $this->assertStringContainsString('ERR|', $body);
-        $this->assertStringContainsString('Test exception', $body);
+        $this->assertEquals('ERR|Test exception', $body);
     }
 }
