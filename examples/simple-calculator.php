@@ -69,7 +69,6 @@ class Calculator
 }
 
 // Parse the service
-$parser = new SoapAttributeParser();
-$handler = $parser->parse(Calculator::class);
+$handler = SoapAttributeParser::parse(Calculator::class);
 $response = $handler->handle();
 ResponseWriter::output($response);

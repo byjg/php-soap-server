@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Test;
 
+use ByJG\SoapServer\SoapAttributeParser;
 use ByJG\SoapServer\SoapHandler;
 use ByJG\SoapServer\SoapOperationConfig;
 use ByJG\SoapServer\SoapParameterConfig;
@@ -15,6 +16,7 @@ use Exception;
 use Override;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface;
+use Test\Fixtures\CalculatorService;
 use Test\Fixtures\SoapHandlerMock;
 
 /**
@@ -241,6 +243,82 @@ class SoapHandlerTest extends TestCase
         $this->assertStringContainsString('Test SOAP Service', $body);
         $this->assertStringContainsString('add', $body);
         $this->assertStringContainsString('greet', $body);
+    }
+
+    /**
+     * Test SOAP request with complex object return as JSON
+     */
+    public function testHandleSOAPComplexReturnJson(): void
+    {
+        // Setup: Create SOAP request with proper envelope
+        $soapBody = '<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+    <SOAP-ENV:Body>
+        <complex>
+            <a>10</a>
+            <b>5</b>
+        </complex>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>';
+
+        $request = $this->createRequest(
+            uri: 'http://localhost/service.php',
+            method: 'POST',
+            headers: [
+                'SOAPAction' => '"urn:TestServiceAction"',
+                'Content-Type' => 'text/xml; charset=utf-8'
+            ],
+            body: $soapBody
+        );
+
+        // Create mock handler to avoid SoapServer complexity
+        $parser = new SoapAttributeParser(SoapHandlerMock::class);
+
+        /** @var SoapHandlerMock $handler */
+        $handler = $parser->parseClass(CalculatorService::class, $request);
+
+        // Execute: Call handle()
+        $response = $handler->handle();
+
+        // Validate: Check response - should be SOAP XML response wrapping JSON data
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals(['text/xml'], $response->getHeader('Content-Type'));
+
+        // The response should be XML with SOAP envelope
+        $body = $response->getBody()->getContents();
+        $expected = file_get_contents(__DIR__ . "/Fixtures/test_handle_soap_complex.xml.txt");
+        $this->assertEquals($expected, $body);
+    }
+
+    /**
+     * Test HTTP method handling with complex object return as JSON
+     */
+    public function testHandleHTTPComplexReturnJson(): void
+    {
+        // Setup: Create request with ?httpmethod=complex&a=10&b=5
+        $request = $this->createRequest('http://localhost/service.php?httpmethod=complex&a=10&b=5');
+
+        // Create mock handler to avoid SoapServer complexity
+        $parser = new SoapAttributeParser(SoapHandlerMock::class);
+
+        /** @var SoapHandlerMock $handler */
+        $handler = $parser->parseClass(CalculatorService::class, $request);
+
+        // Execute: Call handle()
+        $response = $handler->handle();
+
+        // Validate: Check response
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals(['application/json'], $response->getHeader('Content-Type'));
+
+        // Validate JSON response
+        $body = $response->getBody()->getContents();
+        $this->assertJson($body);
+
+        $data = json_decode($body, true);
+        $this->assertEquals(10, $data['a']);
+        $this->assertEquals(5, $data['b']);
+        $this->assertEquals(15, $data['result']);
     }
 
     /**

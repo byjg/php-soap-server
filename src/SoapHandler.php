@@ -265,10 +265,17 @@ class SoapHandler
 
         // Initialize request from parameter or create from globals
         $this->request = $request ?? $this->createRequestFromGlobals();
+    }
 
+    private function getUrl(): string
+    {
         // Determine protocol from request
         $serverParams = $this->request->getServerParams();
-        $this->protocol = (isset($serverParams['HTTPS']) && $serverParams['HTTPS'] == 'on') ? 'https' : 'http';
+        return
+            ((isset($serverParams['HTTPS']) && $serverParams['HTTPS'] == 'on') ? 'https' : 'http') .
+            '://' .
+            ($serverParams['HTTP_HOST'] ?? 'localhost') .
+            $this->getSelfUrl();
     }
 
     /**
@@ -507,10 +514,7 @@ class SoapHandler
         $discoDiscovery->setAttribute('xmlns:xsd', self::SOAP_XML_SCHEMA_VERSION);
         $discoDiscovery->setAttribute('xmlns', self::SCHEMA_DISCO);
         $discoContractRef = $disco->createElement('contractRef');
-        $serverParams = $this->request->getServerParams();
-        $urlBase = $this->protocol . '://'
-            . ($serverParams['HTTP_HOST'] ?? 'localhost')
-            . $this->getSelfUrl();
+        $urlBase = $this->getUrl();
         $discoContractRef->setAttribute('ref', $urlBase . '?wsdl');
         $discoContractRef->setAttribute('docRef', $urlBase);
         $discoContractRef->setAttribute('xmlns', self::SCHEMA_DISCO_SCL);
@@ -635,15 +639,12 @@ class SoapHandler
         $serverParams = $this->request->getServerParams();
         $url = $serverParams['REQUEST_URI'] ?? '';
 
-	$ipos = strpos($url, '?');
-	if ($ipos !== false)
-	{
-		return substr($url, 0, $ipos);
-	}
-	else
-	{
-		return $url;
-	}
+        $ipos = strpos($url, '?');
+        if ($ipos !== false) {
+            return substr($url, 0, $ipos);
+        } else {
+            return $url;
+        }
     }
 
     // }}}
@@ -1216,10 +1217,9 @@ class SoapHandler
         $port->setAttribute('name', $this->classname . 'Port');
         $port->setAttribute('binding', 'typens:' . $this->classname . 'Binding');
         $adress = $this->wsdl->createElement('soap:address');
-        $serverParams = $this->request->getServerParams();
         $adress->setAttribute(
             'location',
-            $this->protocol . '://' . ($serverParams['HTTP_HOST'] ?? 'localhost') . $this->getSelfUrl()
+            $this->getUrl()
         );
         $port->appendChild($adress);
         $service->appendChild($port);

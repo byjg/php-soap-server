@@ -10,7 +10,6 @@ use ByJG\SoapServer\SoapHandler;
 use ByJG\SoapServer\SoapOperationConfig;
 use ByJG\SoapServer\SoapParameterConfig;
 use ByJG\SoapServer\SoapType;
-use Override;
 use PHPUnit\Framework\TestCase;
 use ReflectionObject;
 use Test\Fixtures\CalculatorService;
@@ -21,17 +20,9 @@ use Test\Fixtures\InvalidService;
  */
 class SoapAttributeParserTest extends TestCase
 {
-    private SoapAttributeParser $parser;
-
-    #[Override]
-    protected function setUp(): void
-    {
-        $this->parser = new SoapAttributeParser();
-    }
-
     public function testCanParseServiceMetadata(): void
     {
-        $handler = $this->parser->parse(CalculatorService::class);
+        $handler = SoapAttributeParser::parse(CalculatorService::class);
 
         $this->assertInstanceOf(SoapHandler::class, $handler);
         // Use public properties
@@ -49,7 +40,7 @@ class SoapAttributeParserTest extends TestCase
 
     public function testCanParseOperations(): void
     {
-        $handler = $this->parser->parse(CalculatorService::class);
+        $handler = SoapAttributeParser::parse(CalculatorService::class);
 
         // Access the soapItems through reflection since it's private
         $reflection = new ReflectionObject($handler);
@@ -72,7 +63,7 @@ class SoapAttributeParserTest extends TestCase
 
     public function testCanParseOperationDetails(): void
     {
-        $handler = $this->parser->parse(CalculatorService::class);
+        $handler = SoapAttributeParser::parse(CalculatorService::class);
 
         // Access soapItems
         $reflection = new ReflectionObject($handler);
@@ -89,7 +80,7 @@ class SoapAttributeParserTest extends TestCase
 
     public function testCanParseParameters(): void
     {
-        $handler = $this->parser->parse(CalculatorService::class);
+        $handler = SoapAttributeParser::parse(CalculatorService::class);
 
         // Access soapItems
         $reflection = new ReflectionObject($handler);
@@ -120,7 +111,7 @@ class SoapAttributeParserTest extends TestCase
 
     public function testCanParseOptionalParameters(): void
     {
-        $handler = $this->parser->parse(CalculatorService::class);
+        $handler = SoapAttributeParser::parse(CalculatorService::class);
 
         // Access soapItems
         $reflection = new ReflectionObject($handler);
@@ -142,7 +133,7 @@ class SoapAttributeParserTest extends TestCase
 
     public function testCanParseFloatParameters(): void
     {
-        $handler = $this->parser->parse(CalculatorService::class);
+        $handler = SoapAttributeParser::parse(CalculatorService::class);
 
         // Access soapItems
         $reflection = new ReflectionObject($handler);
@@ -165,7 +156,7 @@ class SoapAttributeParserTest extends TestCase
 
     public function testCanParseNullableReturnType(): void
     {
-        $handler = $this->parser->parse(CalculatorService::class);
+        $handler = SoapAttributeParser::parse(CalculatorService::class);
 
         // Access soapItems
         $reflection = new ReflectionObject($handler);
@@ -184,12 +175,12 @@ class SoapAttributeParserTest extends TestCase
         $this->expectException(InvalidServiceException::class);
         $this->expectExceptionMessage('must have a #[SoapService] attribute');
 
-        $this->parser->parse(InvalidService::class);
+        SoapAttributeParser::parse(InvalidService::class);
     }
 
     public function testExecutorWorks(): void
     {
-        $handler = $this->parser->parse(CalculatorService::class);
+        $handler = SoapAttributeParser::parse(CalculatorService::class);
 
         // Access soapItems
         $reflection = new ReflectionObject($handler);

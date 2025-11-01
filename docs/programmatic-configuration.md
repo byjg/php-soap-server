@@ -257,8 +257,7 @@ class MyService
 }
 
 // Parse attributes
-$parser = new SoapAttributeParser();
-$handler = $parser->parse(MyService::class);
+$handler = SoapAttributeParser::parse(MyService::class);
 
 // Get existing operations
 $operations = $handler->getSoapItems();  // This method doesn't exist in current API

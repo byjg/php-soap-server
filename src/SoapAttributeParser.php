@@ -8,7 +8,9 @@ use ByJG\SoapServer\Attributes\SoapOperation;
 use ByJG\SoapServer\Attributes\SoapParameter as SoapParameterAttribute;
 use ByJG\SoapServer\Attributes\SoapService;
 use ByJG\SoapServer\Exception\InvalidServiceException;
+use Psr\Http\Message\ServerRequestInterface;
 use ReflectionClass;
+use ReflectionException;
 use ReflectionMethod;
 use ReflectionNamedType;
 use ReflectionParameter;
@@ -24,14 +26,32 @@ use ReflectionUnionType;
  */
 class SoapAttributeParser
 {
+    private string $handler = SoapHandler::class;
+
+    public function __construct(string $handler = SoapHandler::class)
+    {
+        if (!is_a($handler, SoapHandler::class, true)) {
+            throw new InvalidServiceException("$handler must be SoapHandler or a subclass of it");
+        }
+
+        $this->handler = $handler;
+    }
+
+    public static function parse(string|object $classOrInstance, ?ServerRequestInterface $request = null): SoapHandler
+    {
+        $parse = new static();
+        return $parse->parseClass($classOrInstance, $request);
+    }
+
     /**
      * Parse a class and return a SoapHandler with all configuration
      *
      * @param string|object $classOrInstance The class name or instance to parse
      * @return SoapHandler The handler ready for SOAP server use
      * @throws InvalidServiceException If the class is not properly annotated
+     * @throws ReflectionException
      */
-    public function parse(string|object $classOrInstance): SoapHandler
+    public function parseClass(string|object $classOrInstance, ?ServerRequestInterface $request = null): SoapHandler
     {
         // Get reflection class
         if (is_object($classOrInstance)) {
@@ -47,12 +67,13 @@ class SoapAttributeParser
         $soapItems = $this->parseOperations($reflection);
 
         // Create and return SoapHandler
-        return new SoapHandler(
+        return new $this->handler(
             soapItems: $soapItems,
             serviceName: $serviceMetadata['serviceName'],
             namespace: $serviceMetadata['namespace'],
             description: $serviceMetadata['description'],
-            options: $serviceMetadata['options']
+            options: $serviceMetadata['options'],
+            request: $request,
         );
     }
 

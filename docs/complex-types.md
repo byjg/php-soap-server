@@ -312,8 +312,7 @@ class UserManagementService
 // Start the service
 use ByJG\SoapServer\ResponseWriter;
 
-$parser = new SoapAttributeParser();
-$handler = $parser->parse(UserManagementService::class);
+$handler = SoapAttributeParser::parse(UserManagementService::class);
 $response = $handler->handle();
 ResponseWriter::output($response);
 ```
