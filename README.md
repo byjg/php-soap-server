@@ -141,6 +141,8 @@ acknowledgments, see [License Acknowledgments](docs/license-acknowledgments.md).
 ```mermaid
 flowchart TD
     byjg/soap-server --> byjg/jinja-php
+    byjg/soap-server --> byjg/webrequest
+    byjg/soap-server --> byjg/serializer
 ```
 
 ----
