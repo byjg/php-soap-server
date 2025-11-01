@@ -21,6 +21,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use ReflectionClass;
 use ReflectionException;
+use ReflectionNamedType;
 use ReflectionObject;
 use SoapServer;
 
@@ -236,7 +237,7 @@ class SoapHandler
         ?ServerRequestInterface $request = null
     )
     {
-        // Set service name (used for WSDL generation)
+        // Set the service name (used for WSDL generation)
         if (!empty($serviceName)) {
             $this->classname = $serviceName;
         } else {
@@ -244,7 +245,7 @@ class SoapHandler
             $this->classname = (new ReflectionObject($this))->getName();
         }
 
-        if (isset($namespace) && $namespace != '') {
+        if (!empty($namespace)) {
             $this->warningNamespace = false;
             //$namespace .= (substr($namespace, -1) == '/') ? '' : '/';
         } else {
@@ -412,7 +413,7 @@ class SoapHandler
         }
 
         // Get the content type from the operation config
-        $contentType = $soapItem->contentType ?? 'text/plain';
+        $contentType = $soapItem->contentType;
 
         // Get parameters from SoapArg objects as associative array
         $paramValues = array();
@@ -717,6 +718,7 @@ class SoapHandler
             for ($i = 0; $i < count($properties); ++$i) {
                 if ($properties[$i]->isPublic()) {
                     // Get type from property type (PHP 8.x typed properties)
+                    /** @var ReflectionNamedType $type */
                     $type = $properties[$i]->getType();
 
                     // Skip properties without type

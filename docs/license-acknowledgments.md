@@ -2,7 +2,8 @@
 
 ## Project License
 
-This project is licensed under the **MIT License**. See the [LICENSE](../LICENSE) file for the full license text.
+This project is licensed under the **MIT License**. See the [LICENSE](https://github.com/byjg/php-soap-server/LICENSE)
+file for the full license text.
 
 ## Third-Party Code Acknowledgments
 
@@ -31,7 +32,8 @@ The original PHP-licensed code provided foundational SOAP server functionality t
 
 - Modernized for PHP 8.1+
 - Refactored to use modern PHP features (attributes, typed properties, etc.)
-- Extended with new features (auto-generated WSDL, discovery support, documentation UI)
+- Extended with new features (support both SOAP and http request)
+- Modernized documentation UI
 - Adapted to follow modern coding standards and best practices
 
 #### PHP License Compatibility

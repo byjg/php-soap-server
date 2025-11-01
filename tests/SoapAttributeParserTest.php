@@ -92,7 +92,6 @@ class SoapAttributeParserTest extends TestCase
         // Check 'add' operation parameters
         $addOperation = $soapItems['add'];
         $this->assertCount(2, $addOperation->args);
-        $this->assertIsArray($addOperation->args);
 
         // Check first parameter
         /** @var SoapParameterConfig $paramA */

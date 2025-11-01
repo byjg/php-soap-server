@@ -7,6 +7,7 @@ use ByJG\WebRequest\Exception\MessageException;
 use ByJG\WebRequest\Psr7\MemoryStream;
 use ByJG\WebRequest\Psr7\Response;
 use Exception;
+use Override;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use ReflectionClass;
@@ -26,6 +27,7 @@ class SoapHandlerMock extends SoapHandler
      * @return ResponseInterface
      * @throws MessageException
      */
+    #[Override]
     protected function createServer(): ResponseInterface
     {
         try {

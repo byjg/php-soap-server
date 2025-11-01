@@ -126,6 +126,7 @@ class SoapAttributeParser
                 continue;
             }
 
+            /** @var SoapOperation $soapOperation */
             $soapOperation = $operationAttributes[0]->newInstance();
 
             // Create SoapOperationConfig
