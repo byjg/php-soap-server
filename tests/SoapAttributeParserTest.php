@@ -58,8 +58,8 @@ class SoapAttributeParserTest extends TestCase
         /** @var array<string, SoapOperationConfig> $soapItems */
         $soapItems = $property->getValue($handler);
 
-        // Should have 5 operations (excluding internalMethod)
-        $this->assertCount(5, $soapItems);
+        // Should have 6 operations (excluding internalMethod)
+        $this->assertCount(6, $soapItems);
 
         // Check operation names
         $this->assertArrayHasKey('add', $soapItems);

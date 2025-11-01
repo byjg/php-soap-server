@@ -53,8 +53,20 @@ class CalculatorService
         return "Hello, $name!";
     }
 
+    #[SoapOperation(description: 'Returns a complex object', contentType: "application/json")]
+    public function complex(int $a, int $b): CalculatorObject
+    {
+        $calculator = new CalculatorObject();
+        $calculator->a = $a;
+        $calculator->b = $b;
+        $calculator->result = $a + $b;
+        return $calculator;
+    }
+
     // Method without SoapOperation attribute - should be ignored
     public function internalMethod(): void
     {
     }
+
+
 }

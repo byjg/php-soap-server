@@ -178,7 +178,7 @@ class SoapHandlerTest extends TestCase
 
         // Validate WSDL content
         $body = $response->getBody()->getContents();
-        $expected = file_get_contents(__DIR__ . "/Fixtures/test_handle_wsdl.xml");
+        $expected = file_get_contents(__DIR__ . "/Fixtures/test_handle_wsdl.xml.txt");
         $this->assertEquals($expected, $body);
     }
 
@@ -207,7 +207,7 @@ class SoapHandlerTest extends TestCase
 
         // Validate DISCO content
         $body = $response->getBody()->getContents();
-        $expected = file_get_contents(__DIR__ . "/Fixtures/test_handle_disco.xml");
+        $expected = file_get_contents(__DIR__ . "/Fixtures/test_handle_disco.xml.txt");
         $this->assertEquals($expected, $body);
     }
 
@@ -350,6 +350,52 @@ class SoapHandlerTest extends TestCase
     }
 
     /**
+     * Test SOAP request with JSON array response
+     */
+    public function testHandleSOAPWithJSONArrayResponse(): void
+    {
+        // Setup: Create SOAP request with proper envelope
+        $soapBody = '<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+    <SOAP-ENV:Body>
+        <getArray>
+            <name>John</name>
+        </getArray>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>';
+
+        $request = $this->createRequest(
+            uri: 'http://localhost/service.php',
+            method: 'POST',
+            headers: [
+                'SOAPAction' => '"urn:TestServiceAction"',
+                'Content-Type' => 'text/xml; charset=utf-8'
+            ],
+            body: $soapBody
+        );
+
+        // Create mock handler to avoid SoapServer complexity
+        $handler = new SoapHandlerMock(
+            soapItems: $this->soapItems,
+            serviceName: 'TestService',
+            namespace: 'urn:TestService',
+            request: $request
+        );
+
+        // Execute: Call handle()
+        $response = $handler->handle();
+
+        // Validate: Check response - should be SOAP XML response wrapping JSON data
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals(['text/xml'], $response->getHeader('Content-Type'));
+
+        // The response should be XML with SOAP envelope
+        $body = $response->getBody()->getContents();
+        $expected = file_get_contents(__DIR__ . "/Fixtures/test_handle_soap_get_array.xml.txt");
+        $this->assertEquals($expected, $body);
+    }
+
+    /**
      * Test HTTP method handling with JSON array response
      */
     public function testHandleHTTPWithJSONArrayResponse(): void
@@ -438,7 +484,7 @@ class SoapHandlerTest extends TestCase
         // Validate XML response
         $body = $response->getBody()->getContents();
         $body = $response->getBody()->getContents();
-        $expected = file_get_contents(__DIR__ . "/Fixtures/test_handle_http_with_xml_model_response.xml");
+        $expected = file_get_contents(__DIR__ . "/Fixtures/test_handle_http_with_xml_model_response.xml.txt");
         $this->assertEquals($expected, $body);
     }
 
