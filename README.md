@@ -4,7 +4,7 @@
 [![GitHub license](https://img.shields.io/github/license/byjg/php-soap-server.svg)](https://opensource.byjg.com/opensource/licensing.html)
 [![GitHub release](https://img.shields.io/github/release/byjg/php-soap-server.svg)](https://github.com/byjg/php-soap-server/releases/)
 
-# byjg/soap-server
+# Soap Server
 
 A lightweight and modern SOAP server implementation for PHP 8.1+
 
@@ -130,7 +130,7 @@ Comprehensive documentation is available:
 
 ## License and Acknowledgments
 
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the [MIT License](https://github.com/byjg/php-soap-server/blob/master/LICENSE).
 
 **Note**: Parts of this codebase were derived from an older PHP class originally licensed under the PHP License. The
 original code has been modernized and adapted for this project. For detailed information about the licensing and
