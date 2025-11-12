@@ -445,19 +445,19 @@ class SoapHandler
         try {
             $result = call_user_func($soapItem->executor, $paramValues);
 
-            if ($contentType === "text/plain") {
+            if (empty($contentType) || $contentType === "text/plain") {
                 if (is_array($result)) {
                     $str = sizeof($result);
                     foreach ($result as $line) {
                         $str .= "|$line";
                     }
                     return Response::getInstance(200)
-                        ->withHeader('Content-Type', $contentType)
-                        ->withBody(new MemoryStream($this->httpSuccess . "$str"));
+                        ->withHeader('Content-Type', "text/plain")
+                        ->withBody(new MemoryStream($this->httpSuccess . trim($str)));
                 } else {
                     return Response::getInstance(200)
-                        ->withHeader('Content-Type', $contentType)
-                        ->withBody(new MemoryStream($this->httpSuccess . $result));
+                        ->withHeader('Content-Type', "text/plain")
+                        ->withBody(new MemoryStream($this->httpSuccess . trim($result)));
                 }
             } else {
                 if ($contentType === "application/json" && !is_string($result)) {
