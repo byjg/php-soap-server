@@ -4,7 +4,6 @@ use ByJG\SoapServer\ResponseWriter;
 use ByJG\SoapServer\SoapHandler;
 use ByJG\SoapServer\SoapOperationConfig;
 use ByJG\SoapServer\SoapParameterConfig;
-use ByJG\SoapServer\SoapTest;
 use ByJG\SoapServer\SoapType;
 
 require_once "vendor/autoload.php";

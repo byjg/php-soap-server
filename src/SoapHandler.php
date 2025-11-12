@@ -26,6 +26,11 @@ use ReflectionObject;
 use SoapServer;
 
 /**
+ * *****************************************
+ * *** ORIGINAL HEADER KEPT BY REFERENCE ***
+ * *** ONLY THE MAIN IDEA REMAINS        ***
+ * *****************************************
+ *
  * Easy Web Service (SOAP) creation
  *
  * PHP Version 5
@@ -119,6 +124,7 @@ class SoapHandler
      * @param string $name Method name
      * @param array $arguments Method arguments
      * @return mixed
+     * @throws Exception
      */
     public function __call(string $name, array $arguments)
     {
@@ -145,14 +151,15 @@ class SoapHandler
     }
 
     /**
-     * Get SoapItem by method name
+     * Get SoapItem by method name (case-insensitive)
      *
      * @param string $methodName
      * @return SoapOperationConfig|null
      */
     private function getSoapItem(string $methodName): SoapOperationConfig|null
     {
-        return $this->soapItems[$methodName] ?? null;
+        $keysInsensitive = array_change_key_case($this->soapItems, CASE_LOWER);
+        return $keysInsensitive[strtolower($methodName)] ?? null;
     }
 
     /**

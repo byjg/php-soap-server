@@ -1,6 +1,5 @@
 <?php
 
-namespace ByJG\SoapServer;
 
 class SoapTest
 {

@@ -511,7 +511,7 @@ class SoapHandlerTest extends TestCase
     public function testHandleHTTPWithJSONModelResponse(): void
     {
         // Setup: Create request with ?httpmethod=getUserJson&name=Alice&age=30
-        $request = $this->createRequest('http://localhost/service.php?httpmethod=getUserJson&name=Alice&age=30');
+        $request = $this->createRequest('http://localhost/service.php?httpmethod=getuserJSON&name=Alice&age=30');
 
         // Create handler with mock request
         $handler = new SoapHandler(
