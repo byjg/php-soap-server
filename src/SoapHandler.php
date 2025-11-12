@@ -447,7 +447,7 @@ class SoapHandler
 
             if (empty($contentType) || $contentType === "text/plain") {
                 if (is_array($result)) {
-                    $str = sizeof($result);
+                    $str = "" . count($result);
                     foreach ($result as $line) {
                         $str .= "|$line";
                     }
