@@ -30,7 +30,7 @@ Link:     http://dschini.org/Services/
 
 The original PHP-licensed code provided foundational SOAP server functionality that has been:
 
-- Modernized for PHP 8.1+
+- Modernized for PHP 8.3+
 - Refactored to use modern PHP features (attributes, typed properties, etc.)
 - Extended with new features (support both SOAP and http request)
 - Modernized documentation UI

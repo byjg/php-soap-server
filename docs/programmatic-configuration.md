@@ -10,7 +10,7 @@ Learn how to configure SOAP services programmatically without using PHP attribut
 
 While attributes provide a clean, declarative way to define services, you might need programmatic configuration for:
 - Dynamic service generation
-- Legacy PHP versions (though this library requires PHP 8.1+)
+- Legacy PHP versions (though this library requires PHP 8.3+)
 - More control over the service structure
 - Runtime configuration
 

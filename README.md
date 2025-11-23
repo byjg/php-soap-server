@@ -1,16 +1,17 @@
 # Soap Server
 
+[![Sponsor](https://img.shields.io/badge/Sponsor-%23ea4aaa?logo=githubsponsors&logoColor=white&labelColor=0d1117)](https://github.com/sponsors/byjg)
 [![Build Status](https://github.com/byjg/php-soap-server/actions/workflows/phpunit.yml/badge.svg?branch=master)](https://github.com/byjg/php-soap-server/actions/workflows/phpunit.yml)
 [![Opensource ByJG](https://img.shields.io/badge/opensource-byjg-success.svg)](http://opensource.byjg.com)
 [![GitHub source](https://img.shields.io/badge/Github-source-informational?logo=github)](https://github.com/byjg/php-soap-server/)
 [![GitHub license](https://img.shields.io/github/license/byjg/php-soap-server.svg)](https://opensource.byjg.com/opensource/licensing.html)
 [![GitHub release](https://img.shields.io/github/release/byjg/php-soap-server.svg)](https://github.com/byjg/php-soap-server/releases/)
 
-A lightweight and modern SOAP server implementation for PHP 8.1+
+A lightweight and modern SOAP server implementation for PHP 8.3+
 
 ## Features
 
-- 🚀 **Modern PHP 8.1+ Attributes**: Use PHP attributes to define SOAP services declaratively
+- 🚀 **Modern PHP 8.3+ Attributes**: Use PHP attributes to define SOAP services declaratively
 - 📝 **Auto-generated WSDL**: Automatic WSDL generation from your service definitions
 - 🎨 **Beautiful Documentation UI**: Modern, interactive HTML documentation with Jinja templates
 - 🔧 **Flexible Configuration**: Support for both attribute-based and programmatic configuration
