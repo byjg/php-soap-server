@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "WebFetch(domain:github.com)"
+      "WebFetch(domain:github.com)",
+      "Bash(git pull:*)",
+      "Bash(composer update:*)",
+      "Bash(composer psalm:*)",
+      "Bash(composer test:*)"
     ],
     "deny": [],
     "ask": []

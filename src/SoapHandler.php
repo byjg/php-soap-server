@@ -411,6 +411,13 @@ class SoapHandler
         $requestParams = array_merge($queryParams, is_array($parsedBody) ? $parsedBody : []);
 
         $methodName = $requestParams["httpmethod"] ?? null;
+
+        if ($methodName === null) {
+            return Response::getInstance(400)
+                ->withHeader('Content-Type', 'text/plain')
+                ->withBody(new MemoryStream($this->httpFailure . "Method name not specified"));
+        }
+
         $soapItem = $this->getSoapItem($methodName);
 
         if (!$soapItem) {
@@ -711,7 +718,7 @@ class SoapHandler
     /**
      * parse complex type (class) properties into struct for WSDL generation
      *
-     * @param string $className string
+     * @param class-string $className string
      * @return void
      * @throws ReflectionException
      * @access private
@@ -771,6 +778,7 @@ class SoapHandler
                     $isObject = false;
                     if (SoapType::tryFrom($cleanType) === null) {
                         try {
+                            /** @var class-string $cleanType */
                             new ReflectionClass($cleanType);
                             $isObject = true;
                         } catch (Exception $e) {
@@ -780,6 +788,7 @@ class SoapHandler
                     $this->wsdlStruct['class'][$className]['property'][$properties[$i]->getName()]['class']
                         = $isObject;
                     if ($isObject) {
+                        /** @var class-string $cleanType */
                         $this->parseComplexTypeIntoStruct($cleanType);
                     }
                     if ($length > 0) {
@@ -822,7 +831,10 @@ class SoapHandler
                 // Get type value (extract from enum if needed)
                 $typeValue = $isSimpleType ? $soapArg->type->value : $soapArg->type;
 
+                $length = 0;
+                /** @var string $cleanType */
                 $cleanType = str_replace('[]', '', $typeValue, $length);
+                /** @var int $length */
                 $typens    = str_repeat('ArrayOf', $length);
 
                 $this->wsdlStruct[$this->classname]['method'][$methodName]['var'][$i]['name'] = $soapArg->name;
@@ -843,7 +855,10 @@ class SoapHandler
             // Process return type from SoapItem
             $isReturnSimpleType = $soapItem->returnType instanceof SoapType;
             $returnTypeValue = $isReturnSimpleType ? $soapItem->returnType->value : $soapItem->returnType;
+            $length = 0;
+            /** @var string $cleanType */
             $cleanType = str_replace('[]', '', $returnTypeValue, $length);
+            /** @var int $length */
             $typens = str_repeat('ArrayOf', $length);
 
             $this->wsdlStruct[$this->classname]['method'][$methodName]['var'][$i]['wsdltype'] = $typens.$cleanType;
@@ -960,6 +975,7 @@ class SoapHandler
                 $restriction->setAttribute('base', 'soapenc:Array');
                 $attribute->setAttribute('ref', 'soapenc:arrayType');
 
+                $class = null;
                 try {
                     $class = new ReflectionClass($target);
                 } catch (Exception $e) {
@@ -970,7 +986,7 @@ class SoapHandler
                         'wsdl:arrayType',
                         'xsd:'.$target.'[]'
                     );
-                } elseif (isset($class)) {
+                } elseif ($class !== null) {
                     $attribute->setAttribute(
                         'wsdl:arrayType',
                         'typens:'.$target.'[]'
@@ -981,7 +997,6 @@ class SoapHandler
                         'typens:'.$target.'[]'
                     );
                 }
-                unset($class);
 
             }
         }

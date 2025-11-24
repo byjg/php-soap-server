@@ -26,8 +26,12 @@ use ReflectionUnionType;
  */
 class SoapAttributeParser
 {
+    /** @var class-string<SoapHandler> */
     private string $handler = SoapHandler::class;
 
+    /**
+     * @param class-string<SoapHandler> $handler
+     */
     public function __construct(string $handler = SoapHandler::class)
     {
         if (!is_a($handler, SoapHandler::class, true)) {
@@ -37,6 +41,9 @@ class SoapAttributeParser
         $this->handler = $handler;
     }
 
+    /**
+     * @param class-string|object $classOrInstance
+     */
     public static function parse(string|object $classOrInstance, ?ServerRequestInterface $request = null): SoapHandler
     {
         $parse = new static();
@@ -46,7 +53,7 @@ class SoapAttributeParser
     /**
      * Parse a class and return a SoapHandler with all configuration
      *
-     * @param string|object $classOrInstance The class name or instance to parse
+     * @param class-string|object $classOrInstance The class name or instance to parse
      * @return SoapHandler The handler ready for SOAP server use
      * @throws InvalidServiceException If the class is not properly annotated
      * @throws ReflectionException
@@ -54,11 +61,7 @@ class SoapAttributeParser
     public function parseClass(string|object $classOrInstance, ?ServerRequestInterface $request = null): SoapHandler
     {
         // Get reflection class
-        if (is_object($classOrInstance)) {
-            $reflection = new ReflectionClass($classOrInstance);
-        } else {
-            $reflection = new ReflectionClass($classOrInstance);
-        }
+        $reflection = new ReflectionClass($classOrInstance);
 
         // Parse SoapService attribute
         $serviceMetadata = $this->parseServiceAttribute($reflection);
