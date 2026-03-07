@@ -1,4 +1,10 @@
+---
+tags: [php, http]
+---
+
 # Soap Server
+
+A lightweight and modern SOAP server implementation for PHP 8.3+
 
 [![Sponsor](https://img.shields.io/badge/Sponsor-%23ea4aaa?logo=githubsponsors&logoColor=white&labelColor=0d1117)](https://github.com/sponsors/byjg)
 [![Build Status](https://github.com/byjg/php-soap-server/actions/workflows/phpunit.yml/badge.svg?branch=master)](https://github.com/byjg/php-soap-server/actions/workflows/phpunit.yml)
@@ -6,8 +12,6 @@
 [![GitHub source](https://img.shields.io/badge/Github-source-informational?logo=github)](https://github.com/byjg/php-soap-server/)
 [![GitHub license](https://img.shields.io/github/license/byjg/php-soap-server.svg)](https://opensource.byjg.com/opensource/licensing.html)
 [![GitHub release](https://img.shields.io/github/release/byjg/php-soap-server.svg)](https://github.com/byjg/php-soap-server/releases/)
-
-A lightweight and modern SOAP server implementation for PHP 8.3+
 
 ## Features
 
@@ -123,11 +127,11 @@ composer psalm
 
 Comprehensive documentation is available:
 
-- [Getting Started](docs/getting-started.md) - Create your first SOAP service
-- [Using Attributes](docs/using-attributes.md) - Attribute-based configuration guide
-- [Programmatic Configuration](docs/programmatic-configuration.md) - API-based configuration
-- [Complex Types](docs/complex-types.md) - Working with custom classes and objects
-- [Templates](docs/templates.md) - Customizing the service documentation UI
+- [Getting Started](getting-started) - Create your first SOAP service
+- [Using Attributes](using-attributes) - Attribute-based configuration guide
+- [Programmatic Configuration](programmatic-configuration) - API-based configuration
+- [Complex Types](complex-types) - Working with custom classes and objects
+- [Templates](templates) - Customizing the service documentation UI
 
 ## License and Acknowledgments
 
@@ -135,7 +139,7 @@ This project is licensed under the [MIT License](https://github.com/byjg/php-soa
 
 **Note**: Parts of this codebase were derived from an older PHP class originally licensed under the PHP License. The
 original code has been modernized and adapted for this project. For detailed information about the licensing and
-acknowledgments, see [License Acknowledgments](docs/license-acknowledgments.md).
+acknowledgments, see [License Acknowledgments](license-acknowledgments).
 
 ## Dependencies
 
