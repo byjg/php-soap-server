@@ -11,7 +11,7 @@ A lightweight and modern SOAP server implementation for PHP 8.3+
 [![Build Status](https://github.com/byjg/php-soap-server/actions/workflows/phpunit.yml/badge.svg?branch=master)](https://github.com/byjg/php-soap-server/actions/workflows/phpunit.yml)
 [![Opensource ByJG](https://img.shields.io/badge/opensource-byjg-success.svg)](http://opensource.byjg.com)
 [![GitHub source](https://img.shields.io/badge/Github-source-informational?logo=github)](https://github.com/byjg/php-soap-server/)
-[![GitHub license](https://img.shields.io/github/license/byjg/php-soap-server.svg)](https://opensource.byjg.com/opensource/licensing.html)
+[![GitHub license](https://img.shields.io/github/license/byjg/php-soap-server.svg)](https://opensource.byjg.com/license/)
 [![GitHub release](https://img.shields.io/github/release/byjg/php-soap-server.svg)](https://github.com/byjg/php-soap-server/releases/)
 
 ## Features
@@ -141,15 +141,6 @@ This project is licensed under the [MIT License](https://github.com/byjg/php-soa
 **Note**: Parts of this codebase were derived from an older PHP class originally licensed under the PHP License. The
 original code has been modernized and adapted for this project. For detailed information about the licensing and
 acknowledgments, see [License Acknowledgments](docs/license-acknowledgments.md).
-
-## Dependencies
-
-```mermaid
-flowchart TD
-    byjg/soap-server --> byjg/jinja-php
-    byjg/soap-server --> byjg/webrequest
-    byjg/soap-server --> byjg/serializer
-```
 
 ----
 [Open source ByJG](https://opensource.byjg.com)
