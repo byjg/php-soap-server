@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Test;
+namespace Tests;
 
 use ByJG\SoapServer\Exception\InvalidServiceException;
 use ByJG\SoapServer\SoapAttributeParser;
@@ -12,8 +12,8 @@ use ByJG\SoapServer\SoapParameterConfig;
 use ByJG\SoapServer\SoapType;
 use PHPUnit\Framework\TestCase;
 use ReflectionObject;
-use Test\Fixtures\CalculatorService;
-use Test\Fixtures\InvalidService;
+use Tests\Fixtures\CalculatorService;
+use Tests\Fixtures\InvalidService;
 
 /**
  * Test suite for SoapAttributeParser

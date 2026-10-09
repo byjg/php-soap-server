@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Test;
+namespace Tests;
 
 use ByJG\SoapServer\SoapAttributeParser;
 use ByJG\SoapServer\SoapHandler;
@@ -16,8 +16,8 @@ use Exception;
 use Override;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface;
-use Test\Fixtures\CalculatorService;
-use Test\Fixtures\SoapHandlerMock;
+use Tests\Fixtures\CalculatorService;
+use Tests\Fixtures\SoapHandlerMock;
 
 /**
  * Simple model for testing JSON/XML responses

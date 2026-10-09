@@ -48,21 +48,10 @@ try {
     $result = $client->divide(15.0, 3.0);
     echo "Result: $result\n\n";
 
-    // Call the divide operation
-    echo "Calling complex...\n";
+    // Call the complex operation, which returns a CalculatorObject
+    echo "Calling complex(20, 30)...\n";
     $result = $client->complex(20, 30);
-    echo "var_dump: \n";
-    var_dump($result);
-
-//    // Call the greet operation (with default parameter)
-//    echo "Calling greet()...\n";
-//    $result = $client->greet();
-//    echo "Result: $result\n\n";
-//
-//    // Call the greet operation (with custom name)
-//    echo "Calling greet('Alice')...\n";
-//    $result = $client->greet('Alice');
-//    echo "Result: $result\n\n";
+    echo "Result: a={$result->a}, b={$result->b}, result={$result->result}\n\n";
 
     echo str_repeat("=", 60) . "\n";
     echo "✓ All operations completed successfully!\n";

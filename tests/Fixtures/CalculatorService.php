@@ -1,6 +1,6 @@
 <?php
 
-namespace Test\Fixtures;
+namespace Tests\Fixtures;
 
 use ByJG\SoapServer\Attributes\SoapOperation;
 use ByJG\SoapServer\Attributes\SoapParameter;

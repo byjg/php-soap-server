@@ -1,6 +1,6 @@
 <?php
 
-namespace Test\Fixtures;
+namespace Tests\Fixtures;
 class CalculatorObject
 {
     public int $a;
