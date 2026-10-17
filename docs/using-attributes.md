@@ -47,6 +47,7 @@ The `options` array accepts standard PHP SoapServer options:
 ```php
 #[SoapService(
     serviceName: 'MyService',
+    namespace: 'http://example.com/',
     options: [
         'soap_version' => SOAP_1_2,
         'encoding' => 'UTF-8',
@@ -71,9 +72,10 @@ public function calculate(int $x, int $y): int
 
 #### Parameters
 
-| Parameter     | Type   | Required | Default | Description                             |
-|---------------|--------|----------|---------|-----------------------------------------|
-| `description` | string | No       | `''`    | Operation description for documentation |
+| Parameter     | Type   | Required | Default        | Description                                                                         |
+|---------------|--------|----------|----------------|-------------------------------------------------------------------------------------|
+| `description` | string | No       | `''`           | Operation description for documentation                                             |
+| `contentType` | string | No       | `'text/plain'` | Response content type when the operation is called over HTTP (`?httpmethod=<name>`) |
 
 ### SoapParameter
 
@@ -98,9 +100,10 @@ public function greet(
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
-| `description` | string | No | `''` | Parameter description for documentation |
-| `minOccurs` | int | No | `1` | Minimum occurrences (0 = optional, 1 = required) |
+| `description` | string | No | `''` | Parameter description (accepted, but not used in the WSDL or the documentation page) |
+| `minOccurs` | int | No | `0` if the parameter has a default value, otherwise `1` | Minimum occurrences (0 = optional, 1 = required) |
 | `maxOccurs` | int | No | `1` | Maximum occurrences (-1 = unbounded/unlimited) |
+| `type` | string | No | from the PHP type | Overrides the parameter type, e.g. `'int[]'`, `'string'` or a class name |
 
 ## Type Support
 
@@ -143,15 +146,14 @@ public function getUsers(
 }
 ```
 
-For typed arrays, use docblocks:
+A plain `array` type is mapped as `mixed`. Docblocks are not read; for a typed array parameter use the `type`
+option of `#[SoapParameter]`:
 
 ```php
-/**
- * @param int[] $ids Array of user IDs
- * @return User[] Array of users
- */
-public function getUsers(array $ids): array
-{
+public function getUsers(
+    #[SoapParameter(type: 'int[]')]  // string[], int[], float[], double[] or bool[]
+    array $ids
+): array {
     // ...
 }
 ```

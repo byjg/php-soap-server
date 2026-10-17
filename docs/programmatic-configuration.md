@@ -246,7 +246,7 @@ You can mix programmatic configuration with attributes by using `SoapAttributePa
 ```php
 use ByJG\SoapServer\SoapAttributeParser;
 
-#[SoapService(serviceName: 'MixedService')]
+#[SoapService(serviceName: 'MixedService', namespace: 'http://example.com/')]
 class MyService
 {
     #[SoapOperation(description: 'Defined with attributes')]

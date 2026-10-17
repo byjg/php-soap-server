@@ -112,19 +112,6 @@ Then access:
 - **DISCO**: [http://localhost:8080?DISCO](http://localhost:8080?disco)
 
 
-## Running Tests
-
-```bash
-composer install
-composer test
-```
-
-## Running Static Analysis
-
-```bash
-composer psalm
-```
-
 ## Documentation
 
 Comprehensive documentation is available:
@@ -142,6 +129,19 @@ This project is licensed under the [MIT License](https://github.com/byjg/php-soa
 **Note**: Parts of this codebase were derived from an older PHP class originally licensed under the PHP License. The
 original code has been modernized and adapted for this project. For detailed information about the licensing and
 acknowledgments, see [License Acknowledgments](docs/license-acknowledgments.md).
+
+## Running Static Analysis
+
+```bash
+composer psalm
+```
+
+## Running Tests
+
+```bash
+composer install
+composer test
+```
 
 ----
 [Open source ByJG](https://opensource.byjg.com)
