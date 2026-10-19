@@ -63,6 +63,12 @@ class CalculatorService
         return $calculator;
     }
 
+    #[SoapOperation(description: 'Joins three numbers, the last two are optional')]
+    public function join(int $a, int $b = 2, int $c = 3): string
+    {
+        return "$a-$b-$c";
+    }
+
     // Method without SoapOperation attribute - should be ignored
     public function internalMethod(): void
     {

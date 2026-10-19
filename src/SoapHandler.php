@@ -469,7 +469,7 @@ class SoapHandler
             } else {
                 if ($contentType === "application/json" && !is_string($result)) {
                     $result = Serialize::from($result)->toJson();
-                } elseif ($contentType === "text/xml" && !is_string($result)) {
+                } elseif (in_array($contentType, ["text/xml", "application/xml"]) && !is_string($result)) {
                     $result = Serialize::from($result)->toXml();
                 }
 
@@ -984,7 +984,7 @@ class SoapHandler
                 if (SoapType::tryFrom($target) !== null) {
                     $attribute->setAttribute(
                         'wsdl:arrayType',
-                        'xsd:'.$target.'[]'
+                        $this->xsdType((string)$target).'[]'
                     );
                 } elseif ($class !== null) {
                     $attribute->setAttribute(
@@ -1015,8 +1015,8 @@ class SoapHandler
                     $element->setAttribute('name', $var['name']);
                     $element->setAttribute(
                         'type',
-                        (($var['array'] != 1 && $var['class'] != 1) ?
-                        'xsd:' : 'typens:') . $var['wsdltype']
+                        ($var['array'] != 1 && $var['class'] != 1) ?
+                        $this->xsdType($var['wsdltype']) : 'typens:' . $var['wsdltype']
                     );
 
                     // Add minOccurs and maxOccurs
@@ -1051,7 +1051,8 @@ class SoapHandler
                     $element->setAttribute('name', $cpname);
                     $element->setAttribute(
                         'type',
-                        (SoapType::tryFrom($cpValue['wsdltype']) !== null ? 'xsd:' : 'typens:') . $cpValue['wsdltype']
+                        SoapType::tryFrom($cpValue['wsdltype']) !== null ?
+                        $this->xsdType($cpValue['wsdltype']) : 'typens:' . $cpValue['wsdltype']
                     );
 
                     // Add minOccurs and maxOccurs if specified
@@ -1068,6 +1069,21 @@ class SoapHandler
             }
         }
         $this->wsdlDefinitions->appendChild($types);
+    }
+
+    /**
+     * Map a SoapType value to its qualified XML Schema type (e.g. 'bool' => 'xsd:boolean')
+     *
+     * @param string $type
+     * @return string
+     */
+    private function xsdType(string $type): string
+    {
+        return 'xsd:' . match ($type) {
+            'bool' => 'boolean',
+            'mixed' => 'anyType',
+            default => $type,
+        };
     }
 
     // }}}
@@ -1102,8 +1118,8 @@ class SoapHandler
                     $part->setAttribute('name', $methodVars['name']);
                     $part->setAttribute(
                         'type',
-                        (($methodVars['array'] != 1 && $methodVars['class'] != 1) ?
-                        'xsd:' : 'typens:') . $methodVars['wsdltype']
+                        ($methodVars['array'] != 1 && $methodVars['class'] != 1) ?
+                        $this->xsdType($methodVars['wsdltype']) : 'typens:' . $methodVars['wsdltype']
                     );
                     $messageInput->appendChild($part);
                 }
@@ -1112,8 +1128,8 @@ class SoapHandler
                     $part->setAttribute('name', $name.'Response');
                     $part->setAttribute(
                         'type',
-                        (($methodVars['array'] != 1 && $methodVars['class'] != 1) ?
-                        'xsd:' : 'typens:') . $methodVars['wsdltype']
+                        ($methodVars['array'] != 1 && $methodVars['class'] != 1) ?
+                        $this->xsdType($methodVars['wsdltype']) : 'typens:' . $methodVars['wsdltype']
                     );
                     $messageOutput->appendChild($part);
                 }

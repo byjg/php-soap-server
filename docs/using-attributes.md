@@ -75,7 +75,7 @@ public function calculate(int $x, int $y): int
 | Parameter     | Type   | Required | Default        | Description                                                                         |
 |---------------|--------|----------|----------------|-------------------------------------------------------------------------------------|
 | `description` | string | No       | `''`           | Operation description for documentation                                             |
-| `contentType` | string | No       | `'text/plain'` | Response content type when the operation is called over HTTP (`?httpmethod=<name>`) |
+| `contentType` | string | No       | `'text/plain'` | Response content type when the operation is called over HTTP (`?httpmethod=<name>`). A non-string result is serialised for `application/json`, `text/xml` and `application/xml` |
 
 ### SoapParameter
 
@@ -122,6 +122,8 @@ public function examples(
 }
 ```
 
+A parameter or return value without a type, or typed `mixed`, is mapped to `xsd:anyType`.
+
 ### Nullable Types
 
 Use PHP's nullable type syntax:
@@ -146,7 +148,7 @@ public function getUsers(
 }
 ```
 
-A plain `array` type is mapped as `mixed`. Docblocks are not read; for a typed array parameter use the `type`
+A plain `array` type is mapped as `mixed` (`xsd:anyType` in the WSDL). Docblocks are not read; for a typed array parameter use the `type`
 option of `#[SoapParameter]`:
 
 ```php
@@ -170,6 +172,9 @@ public function greet(
     return $title ? "$title $name" : "Hello, $name";
 }
 ```
+
+When the operation is called over HTTP (`?httpmethod=<name>`), an omitted optional parameter takes its PHP default
+value; the parameters after it are still passed by name.
 
 ## Complete Example
 

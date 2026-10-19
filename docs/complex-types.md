@@ -79,7 +79,7 @@ public function getAllUsers(): array
 }
 ```
 
-A PHPDoc `@return User[]` is not read: the WSDL maps an `array` return type as `mixed`. It is still useful as code
+A PHPDoc `@return User[]` is not read: the WSDL maps an `array` return type as `mixed` (`xsd:anyType`). It is still useful as code
 documentation:
 
 ```php

@@ -152,9 +152,9 @@ class SoapAttributeParser
                     $instance = $reflection->newInstance();
                 }
 
-                // Call method with positional arguments in correct order
+                // Call method with named arguments, so omitted optional parameters keep their defaults
                 // Note: Type casting is handled by SoapHandler before calling the executor
-                return $instance->$methodName(...array_values($params));
+                return $instance->$methodName(...$params);
             };
 
             $soapItems[$methodName] = $config;

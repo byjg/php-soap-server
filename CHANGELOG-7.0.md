@@ -5,7 +5,18 @@
 
 ## Breaking Changes
 
-- None.
+- The generated WSDL now uses valid XML Schema types: `bool` is emitted as `xsd:boolean` (was `xsd:bool`)
+  and `mixed` as `xsd:anyType` (was `xsd:mixed`), including inside array types. Clients generated from
+  the old WSDL should be regenerated.
+
+## Bug Fixes
+
+- WSDL: `xsd:bool` and `xsd:mixed` are not XML Schema types. They are now `xsd:boolean` and `xsd:anyType`.
+- `?httpmethod` on an attribute-based service: a missing optional parameter shifted the parameters after it
+  one position left, because the executor passed the arguments by position. They are now passed by name, so
+  the omitted parameter takes its default value.
+- `?httpmethod` with `contentType: 'application/xml'` and a non-string result: the result is now serialised
+  to XML, as with `text/xml`. It used to fail with a `TypeError`.
 
 ## Requirements
 

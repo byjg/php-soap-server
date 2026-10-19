@@ -30,6 +30,15 @@ class TestUserModel
 }
 
 /**
+ * Model with bool and untyped array properties, for WSDL type mapping tests
+ */
+class TestFlagsModel
+{
+    public bool $active;
+    public array $extra;
+}
+
+/**
  * Test suite for SoapHandler
  */
 class SoapHandlerTest extends TestCase
@@ -803,5 +812,75 @@ class SoapHandlerTest extends TestCase
         // Validate error message
         $body = $response->getBody()->getContents();
         $this->assertEquals('ERR|Test exception', $body);
+    }
+
+    /**
+     * The WSDL must use valid XML Schema types: bool => xsd:boolean, mixed => xsd:anyType
+     */
+    public function testWSDLMapsBoolAndMixedToValidXsdTypes(): void
+    {
+        $operation = new SoapOperationConfig();
+        $operation->description = 'Uses bool and mixed';
+        $operation->args = [
+            new SoapParameterConfig('flag', SoapType::Boolean),
+            new SoapParameterConfig('flags', SoapType::ArrayOfBoolean),
+            new SoapParameterConfig('model', TestFlagsModel::class),
+        ];
+        $operation->returnType = SoapType::Mixed;
+        $operation->executor = fn(array $params) => null;
+
+        $handler = new SoapHandler(
+            soapItems: ['check' => $operation],
+            serviceName: 'TestService',
+            request: $this->createRequest('http://localhost/service.php?wsdl')
+        );
+
+        $body = $handler->handle()->getBody()->getContents();
+
+        $this->assertStringContainsString('<xsd:element name="flag" type="xsd:boolean"', $body);
+        $this->assertStringContainsString('<part name="flag" type="xsd:boolean"/>', $body);
+        $this->assertStringContainsString('wsdl:arrayType="xsd:boolean[]"', $body);
+        $this->assertStringContainsString('<part name="checkResponse" type="xsd:anyType"/>', $body);
+        $this->assertStringContainsString('<xsd:element name="active" type="xsd:boolean"/>', $body);
+        $this->assertStringContainsString('wsdl:arrayType="xsd:anyType[]"', $body);
+        $this->assertStringNotContainsString('xsd:bool"', $body);
+        $this->assertStringNotContainsString('xsd:bool[]', $body);
+        $this->assertStringNotContainsString('xsd:mixed', $body);
+    }
+
+    /**
+     * A missing optional middle parameter must not shift the parameters after it
+     */
+    public function testHandleHTTPAttributeServiceWithMissingOptionalMiddleParameter(): void
+    {
+        $request = $this->createRequest('http://localhost/service.php?httpmethod=join&a=1&c=9');
+
+        $handler = SoapAttributeParser::parse(CalculatorService::class, $request);
+        $response = $handler->handle();
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('OK|1-2-9', $response->getBody()->getContents());
+    }
+
+    /**
+     * application/xml serialises a non-string result like text/xml
+     */
+    public function testHandleHTTPWithApplicationXMLModelResponse(): void
+    {
+        $this->soapItems['getUserXml']->contentType = 'application/xml';
+        $request = $this->createRequest('http://localhost/service.php?httpmethod=getUserXml&name=Bob');
+
+        $handler = new SoapHandler(
+            soapItems: $this->soapItems,
+            serviceName: 'TestService',
+            request: $request
+        );
+
+        $response = $handler->handle();
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals(['application/xml'], $response->getHeader('Content-Type'));
+        $expected = file_get_contents(__DIR__ . "/Fixtures/test_handle_http_with_xml_model_response.xml.txt");
+        $this->assertEquals($expected, $response->getBody()->getContents());
     }
 }

@@ -50,7 +50,7 @@ class SoapAttributeParserTest extends TestCase
         $soapItems = $property->getValue($handler);
 
         // Should have 6 operations (excluding internalMethod)
-        $this->assertCount(6, $soapItems);
+        $this->assertCount(7, $soapItems);
 
         // Check operation names
         $this->assertArrayHasKey('add', $soapItems);
