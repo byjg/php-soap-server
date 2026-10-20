@@ -1,6 +1,6 @@
 <?php
 
-namespace Test\Fixtures;
+namespace Tests\Fixtures;
 
 use ByJG\SoapServer\Attributes\SoapOperation;
 use ByJG\SoapServer\Attributes\SoapParameter;
@@ -61,6 +61,12 @@ class CalculatorService
         $calculator->b = $b;
         $calculator->result = $a + $b;
         return $calculator;
+    }
+
+    #[SoapOperation(description: 'Joins three numbers, the last two are optional')]
+    public function join(int $a, int $b = 2, int $c = 3): string
+    {
+        return "$a-$b-$c";
     }
 
     // Method without SoapOperation attribute - should be ignored

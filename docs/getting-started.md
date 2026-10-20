@@ -160,7 +160,7 @@ The `#[SoapOperation]` attribute marks a method as a SOAP operation and provides
 #[SoapParameter(description: 'The first number')] int $a
 ```
 
-The `#[SoapParameter]` attribute adds documentation for method parameters.
+The `#[SoapParameter]` attribute adds metadata to method parameters (see [Using Attributes](using-attributes.md#soapparameter)).
 
 ## Service Endpoints
 

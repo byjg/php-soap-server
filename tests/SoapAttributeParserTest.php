@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Test;
+namespace Tests;
 
 use ByJG\SoapServer\Exception\InvalidServiceException;
 use ByJG\SoapServer\SoapAttributeParser;
@@ -12,8 +12,8 @@ use ByJG\SoapServer\SoapParameterConfig;
 use ByJG\SoapServer\SoapType;
 use PHPUnit\Framework\TestCase;
 use ReflectionObject;
-use Test\Fixtures\CalculatorService;
-use Test\Fixtures\InvalidService;
+use Tests\Fixtures\CalculatorService;
+use Tests\Fixtures\InvalidService;
 
 /**
  * Test suite for SoapAttributeParser
@@ -50,7 +50,7 @@ class SoapAttributeParserTest extends TestCase
         $soapItems = $property->getValue($handler);
 
         // Should have 6 operations (excluding internalMethod)
-        $this->assertCount(6, $soapItems);
+        $this->assertCount(7, $soapItems);
 
         // Check operation names
         $this->assertArrayHasKey('add', $soapItems);

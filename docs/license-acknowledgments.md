@@ -1,8 +1,12 @@
+---
+sidebar_position: 6
+---
+
 # License Acknowledgments
 
 ## Project License
 
-This project is licensed under the **MIT License**. See the [LICENSE](https://github.com/byjg/php-soap-server/LICENSE)
+This project is licensed under the **MIT License**. See the [LICENSE](https://github.com/byjg/php-soap-server/blob/master/LICENSE)
 file for the full license text.
 
 ## Third-Party Code Acknowledgments

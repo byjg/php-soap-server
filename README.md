@@ -9,9 +9,10 @@ A lightweight and modern SOAP server implementation for PHP 8.3+
 
 [![Sponsor](https://img.shields.io/badge/Sponsor-%23ea4aaa?logo=githubsponsors&logoColor=white&labelColor=0d1117)](https://github.com/sponsors/byjg)
 [![Build Status](https://github.com/byjg/php-soap-server/actions/workflows/phpunit.yml/badge.svg?branch=master)](https://github.com/byjg/php-soap-server/actions/workflows/phpunit.yml)
-[![Opensource ByJG](https://img.shields.io/badge/opensource-byjg-success.svg)](http://opensource.byjg.com)
+[![Opensource ByJG](https://img.shields.io/badge/opensource-byjg-success.svg)](https://opensource.byjg.com)
+[![Install MCP Server](https://img.shields.io/badge/Install-MCP_Server-8A2BE2?logo=modelcontextprotocol&logoColor=white)](https://opensource.byjg.com/docs/ai/mcpserver-byjg-docs/)
 [![GitHub source](https://img.shields.io/badge/Github-source-informational?logo=github)](https://github.com/byjg/php-soap-server/)
-[![GitHub license](https://img.shields.io/github/license/byjg/php-soap-server.svg)](https://opensource.byjg.com/opensource/licensing.html)
+[![GitHub license](https://img.shields.io/github/license/byjg/php-soap-server.svg)](https://opensource.byjg.com/license/)
 [![GitHub release](https://img.shields.io/github/release/byjg/php-soap-server.svg)](https://github.com/byjg/php-soap-server/releases/)
 
 ## Features
@@ -111,19 +112,6 @@ Then access:
 - **DISCO**: [http://localhost:8080?DISCO](http://localhost:8080?disco)
 
 
-## Running Tests
-
-```bash
-composer install
-composer test
-```
-
-## Running Static Analysis
-
-```bash
-composer psalm
-```
-
 ## Documentation
 
 Comprehensive documentation is available:
@@ -142,13 +130,17 @@ This project is licensed under the [MIT License](https://github.com/byjg/php-soa
 original code has been modernized and adapted for this project. For detailed information about the licensing and
 acknowledgments, see [License Acknowledgments](docs/license-acknowledgments.md).
 
-## Dependencies
+## Running Static Analysis
 
-```mermaid
-flowchart TD
-    byjg/soap-server --> byjg/jinja-php
-    byjg/soap-server --> byjg/webrequest
-    byjg/soap-server --> byjg/serializer
+```bash
+composer psalm
+```
+
+## Running Tests
+
+```bash
+composer install
+composer test
 ```
 
 ----

@@ -178,28 +178,8 @@ Simply edit `templates/service-info.html.jinja`:
 
 ### Method 2: Create Multiple Templates
 
-You can create different templates for different services. The library currently uses a single template, but you can extend `SoapHandler` to support template selection:
-
-```php
-class CustomSoapHandler extends SoapHandler
-{
-    private string $templateName = 'service-info.html';
-
-    public function setTemplate(string $name): void
-    {
-        $this->templateName = $name;
-    }
-
-    protected function handleINFO(): void
-    {
-        // Use custom template name
-        $templatePath = __DIR__ . '/../templates';
-        $loader = new FileSystemLoader($templatePath);
-        $template = $loader->getTemplate($this->templateName);
-        // ... render template
-    }
-}
-```
+Not supported. `SoapHandler` always renders `templates/service-info.html.jinja` from the package folder, and the
+method that renders it (`handleINFO()`) is private, so a subclass cannot replace it.
 
 ## Template Best Practices
 

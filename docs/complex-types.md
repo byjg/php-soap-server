@@ -37,7 +37,7 @@ All public properties must have type hints. The library uses these to generate t
 ```php
 use ByJG\SoapServer\Attributes\{SoapService, SoapOperation};
 
-#[SoapService(serviceName: 'UserService')]
+#[SoapService(serviceName: 'UserService', namespace: 'http://example.com/users')]
 class UserService
 {
     #[SoapOperation(description: 'Creates a new user')]
@@ -79,7 +79,8 @@ public function getAllUsers(): array
 }
 ```
 
-Use PHPDoc for better documentation:
+A PHPDoc `@return User[]` is not read: the WSDL maps an `array` return type as `mixed` (`xsd:anyType`). It is still useful as code
+documentation:
 
 ```php
 /**
@@ -97,12 +98,12 @@ public function getActiveUsers(): array
 When using programmatic configuration, specify the class name as a string:
 
 ```php
-use ByJG\SoapServer\{SoapHandler, SoapOperationConfig, SoapParameter};
+use ByJG\SoapServer\{SoapHandler, SoapOperationConfig, SoapParameterConfig, SoapType};
 
 $operation = new SoapOperationConfig();
 $operation->description = 'Creates a user';
 $operation->args = [
-    new SoapParameter('user', User::class)  // Use class name
+    new SoapParameterConfig('user', User::class)  // Use class name
 ];
 $operation->returnType = SoapType::Boolean;
 $operation->executor = function(array $params) {
@@ -151,7 +152,8 @@ class User
     public string $email;
 
     /**
-     * @var string[] Array of roles
+     * Array of roles
+     * @var string[]
      */
     public array $roles;
 }
@@ -170,6 +172,7 @@ public function createUser(User $user): bool
 **Array Types**
 
 Use PHPDoc `@var` annotations to specify array element types, as PHP doesn't support typed arrays natively.
+The `@var Type[]` tag must be the last thing on its line (no description after it).
 :::
 
 ## Nullable Complex Types
