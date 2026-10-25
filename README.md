@@ -5,7 +5,7 @@ tags: [php, http]
 
 # Soap Server
 
-A lightweight and modern SOAP server implementation for PHP 8.3+
+Publish a PHP class as a SOAP service with attributes: the WSDL and an HTML documentation page are generated for you.
 
 [![Sponsor](https://img.shields.io/badge/Sponsor-%23ea4aaa?logo=githubsponsors&logoColor=white&labelColor=0d1117)](https://github.com/sponsors/byjg)
 [![Build Status](https://github.com/byjg/php-soap-server/actions/workflows/phpunit.yml/badge.svg?branch=master)](https://github.com/byjg/php-soap-server/actions/workflows/phpunit.yml)
@@ -14,6 +14,29 @@ A lightweight and modern SOAP server implementation for PHP 8.3+
 [![GitHub source](https://img.shields.io/badge/Github-source-informational?logo=github)](https://github.com/byjg/php-soap-server/)
 [![GitHub license](https://img.shields.io/github/license/byjg/php-soap-server.svg)](https://opensource.byjg.com/license/)
 [![GitHub release](https://img.shields.io/github/release/byjg/php-soap-server.svg)](https://github.com/byjg/php-soap-server/releases/)
+
+## Why
+
+SOAP is still the contract for banks, governments and many enterprise systems, and PHP's
+`SoapServer` expects you to write the WSDL by hand: a long XML document that has to match
+your code exactly.
+
+Soap Server builds it from the class. Mark the class and its methods with attributes, and
+the service answers the SOAP calls, serves the WSDL (`?wsdl`), a discovery document
+(`?disco`) and an HTML page that documents every operation:
+
+```php
+#[SoapService(serviceName: 'CalculatorService', namespace: 'http://example.com/calculator')]
+class Calculator
+{
+    #[SoapOperation(description: 'Adds two numbers together')]
+    public function add(int $a, int $b): int { return $a + $b; }
+}
+
+ResponseWriter::output(SoapAttributeParser::parse(Calculator::class)->handle());
+```
+
+SOAP 1.1 and 1.2, complex types and arrays are supported.
 
 ## Features
 
