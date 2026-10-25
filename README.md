@@ -1,5 +1,6 @@
 ---
 sidebar_key: soap-server
+sidebar_category: http-apis
 tags: [php, http]
 ---
 
