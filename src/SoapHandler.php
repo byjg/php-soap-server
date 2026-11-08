@@ -7,7 +7,6 @@ namespace ByJG\SoapServer;
 use ByJG\JinjaPhp\Exception\TemplateParseException;
 use ByJG\JinjaPhp\Loader\FileSystemLoader;
 use ByJG\Serializer\Serialize;
-use ByJG\Util\Uri;
 use ByJG\WebRequest\Exception\MessageException;
 use ByJG\WebRequest\Exception\RequestException;
 use ByJG\WebRequest\Psr7\MemoryStream;
@@ -272,7 +271,7 @@ class SoapHandler
         $this->wsdlStruct = array();
 
         // Initialize request from parameter or create from globals
-        $this->request = $request ?? $this->createRequestFromGlobals();
+        $this->request = $request ?? ServerRequest::fromGlobals();
     }
 
     private function getUrl(): string
@@ -284,58 +283,6 @@ class SoapHandler
             '://' .
             ($serverParams['HTTP_HOST'] ?? 'localhost') .
             $this->getSelfUrl();
-    }
-
-    /**
-     * Create a PSR-7 ServerRequest from PHP global variables
-     *
-     * @return ServerRequestInterface
-     * @throws MessageException
-     * @throws RequestException
-     */
-    private function createRequestFromGlobals(): ServerRequestInterface
-    {
-        // Get the request URI
-        $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
-        $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-        $scheme = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? 'https' : 'http';
-        $uri = new Uri($scheme . '://' . $host . $requestUri);
-
-        // Create ServerRequest with global variables
-        $request = new ServerRequest($uri, $_SERVER, $_COOKIE);
-
-        // Set the HTTP method
-        $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
-        $request = $request->withMethod($method);
-
-        // Add headers from SERVER
-        foreach ($_SERVER as $key => $value) {
-            if (str_starts_with($key, 'HTTP_')) {
-                $headerName = str_replace('_', '-', substr($key, 5));
-                $request = $request->withHeader($headerName, $value);
-            } elseif (in_array($key, ['CONTENT_TYPE', 'CONTENT_LENGTH'])) {
-                $headerName = str_replace('_', '-', $key);
-                $request = $request->withHeader($headerName, $value);
-            }
-        }
-
-        // Set the request body from php://input
-        $body = file_get_contents('php://input');
-        if ($body) {
-            $request = $request->withBody(new MemoryStream($body));
-        }
-
-        // Parse body for POST/PUT requests
-        if (in_array($method, ['POST', 'PUT', 'PATCH'])) {
-            $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
-            if (stripos($contentType, 'application/x-www-form-urlencoded') !== false) {
-                $request = $request->withParsedBody($_POST);
-            } elseif (stripos($contentType, 'multipart/form-data') !== false) {
-                $request = $request->withParsedBody($_POST);
-            }
-        }
-
-        return $request;
     }
 
     // }}}

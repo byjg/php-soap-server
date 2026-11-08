@@ -55,3 +55,6 @@ While 7.0 is unreleased these resolve to `7.0.x-dev` from each component's
 ## Housekeeping
 
 - `phpunit.xml.dist` renamed to `phpunit.xml`.
+- Without a request, `SoapHandler` builds it with byjg/webrequest's `ServerRequest::fromGlobals()`
+  instead of its own copy of that code. The body is copied from `php://input` to a stream that goes to
+  disk past 2 MB, instead of a string in memory, and `$_FILES` is passed on as the uploaded files.

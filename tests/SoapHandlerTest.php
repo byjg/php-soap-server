@@ -194,6 +194,39 @@ class SoapHandlerTest extends TestCase
     }
 
     /**
+     * Without a request, the handler reads PHP's globals: the query, the scheme and the host,
+     * as the WSDL's address shows
+     */
+    public function testRequestFromGlobals(): void
+    {
+        $originalServer = $_SERVER;
+        try {
+            $_SERVER['REQUEST_METHOD'] = 'GET';
+            $_SERVER['REQUEST_URI'] = '/service.php?wsdl';
+            $_SERVER['HTTP_HOST'] = 'soap.example.com';
+            $_SERVER['HTTPS'] = 'on';
+
+            $handler = new SoapHandler(
+                soapItems: $this->soapItems,
+                serviceName: 'TestService',
+                namespace: 'http://example.com/test',
+                description: 'Test SOAP Service'
+            );
+            $response = $handler->handle();
+        } finally {
+            $_SERVER = $originalServer;
+        }
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $expected = str_replace(
+            '<soap:address location="http://localhost"/>',
+            '<soap:address location="https://soap.example.com/service.php"/>',
+            file_get_contents(__DIR__ . "/Fixtures/test_handle_wsdl.xml.txt")
+        );
+        $this->assertEquals($expected, $response->getBody()->getContents());
+    }
+
+    /**
      * Test DISCO generation when ?disco query parameter is present
      */
     public function testHandleDISCO(): void
